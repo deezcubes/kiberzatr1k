@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "deadlines",
+  "info": {
+    "singularName": "deadline",
+    "pluralName": "deadlines",
+    "displayName": "Deadline",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "subject": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::subject.subject"
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "datetime": {
+      "type": "datetime",
+      "required": true
+    },
+    "comment": {
+      "type": "richtext",
+      "required": false
+    },
+    "link": {
+      "type": "string",
+      "required": false,
+      "regex": "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
+    }
+  }
+}

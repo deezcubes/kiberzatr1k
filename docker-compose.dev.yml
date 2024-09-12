@@ -1,0 +1,27 @@
+volumes:
+  lavinmq: null
+  postgres: null
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: admin
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: pazzword228
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  lavinmq:
+    image: cloudamqp/lavinmq
+    restart: always
+    shm_size: 128mb
+    volumes:
+      - lavinmq:/var/lib/lavinmq
+    ports:
+      - 15672:15672
+      - 5672:5672
