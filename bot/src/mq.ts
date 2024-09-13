@@ -4,6 +4,7 @@ import {config} from "./config";
 export type EventType = 'CREATED' | 'UPDATED'
 
 export interface DeadlineMqDto {
+    id: number,
     name: string,
     subject: string | null,
     datetime: string,

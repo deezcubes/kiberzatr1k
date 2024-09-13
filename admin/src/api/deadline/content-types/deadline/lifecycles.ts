@@ -1,6 +1,7 @@
 type EventType = 'CREATED' | 'UPDATED'
 
 interface DeadlineMqDto {
+  id: number,
   name: string,
   subject: string | null,
   datetime: string,
@@ -14,6 +15,7 @@ async function sendEvent(type: EventType, id: number) {
   });
 
   const entry = <DeadlineMqDto>{
+    id,
     name: rawEntry.name,
     subject: rawEntry.subject?.name ?? null,
     datetime: rawEntry.datetime,

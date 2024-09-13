@@ -13,6 +13,7 @@ marked.use({
 })
 
 export interface DeadlineDto {
+    id: number,
     name: string,
     subject: string | null,
     datetime: dayjs.Dayjs,
@@ -24,8 +25,9 @@ const formatComment = (comment: string | null) => comment ? sanitizeHtml(marked.
     allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'span', 'tg-spoiler', 'a', 'tg-emoji', 'code', 'pre', 'blockquote']
 }) : null
 
-const mapDeadline = (deadline: Deadline) => {
+const mapDeadline = (id: number, deadline: Deadline) => {
     return (<DeadlineDto>{
+        id,
         name: deadline.name,
         subject: deadline.subject?.data?.attributes?.name ?? null,
         datetime: dayjs(deadline.datetime),
@@ -36,6 +38,7 @@ const mapDeadline = (deadline: Deadline) => {
 
 export const mapMqDeadeline = (deadline: DeadlineMqDto) => {
     return (<DeadlineDto>{
+        id: deadline.id,
         name: deadline.name,
         subject: deadline.subject,
         datetime: dayjs(deadline.datetime),
@@ -46,7 +49,7 @@ export const mapMqDeadeline = (deadline: DeadlineMqDto) => {
 
 const getAllDeadlines = async () => {
     const apiDeadlines = await fetchDeadlines()
-    return apiDeadlines.map(deadline => mapDeadline(deadline.attributes!))
+    return apiDeadlines.map(deadline => mapDeadline(deadline.id!, deadline.attributes!))
 }
 
 export const getActiveDeadlines = async () => {
