@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import {Deadline, fetchDeadlines} from "./api";
 import sanitizeHtml from "sanitize-html";
 import {DeadlineMqDto} from "./mq";
+import _ from 'lodash'
 
 marked.use({
     tokenizer: {
@@ -55,7 +56,7 @@ const getAllDeadlines = async () => {
 export const getActiveDeadlines = async () => {
     const allDeadlines = await getAllDeadlines()
     const now = dayjs()
-    return allDeadlines.filter(it => it.datetime.isAfter(now)).sort((a, b) => a.datetime.diff(b.datetime))
+    return _(allDeadlines).filter(it => it.datetime.isAfter(now)).sortBy(it => it.datetime.unix())
 }
 
 export function formatDeadline(deadline: DeadlineDto): string {
