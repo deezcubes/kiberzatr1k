@@ -6,6 +6,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import 'dayjs/locale/ru.js'
 import {bot} from "./bot";
+import {defineJobs} from "./cron";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -14,6 +15,7 @@ dayjs.extend(relativeTime)
 dayjs.locale('ru')
 
 bot.launch()
+defineJobs()
 
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'))
