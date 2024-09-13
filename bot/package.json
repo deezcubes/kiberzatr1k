@@ -7,6 +7,7 @@
     "node": ">= 18 < 21"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.7",
     "@types/node": "~20",
     "@types/sanitize-html": "^2.13.0",
     "@types/showdown": "^2.0.6",
@@ -29,13 +30,14 @@
     "cron": "^3.1.7",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
+    "lodash": "^4.17.21",
     "marked": "^14.1.2",
     "openapi-fetch": "^0.12.0",
-    "p-timeout": "^6.1.2",
-    "sanitize-html": "^2.13.0",
-    "telegraf": "^4.16.3",
     "openapi-typescript": "^7.4.0",
+    "p-timeout": "^6.1.2",
     "rollup": "^4.21.3",
-    "rollup-plugin-typescript2": "^0.36.0"
+    "rollup-plugin-typescript2": "^0.36.0",
+    "sanitize-html": "^2.13.0",
+    "telegraf": "^4.16.3"
   }
 }
