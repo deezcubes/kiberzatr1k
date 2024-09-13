@@ -7,7 +7,7 @@ import {config} from "./config";
 export type Deadline = components['schemas']['Deadline']
 
 const client = createClient<paths>({
-  baseUrl: "http://100.66.85.62:1337/api/",
+  baseUrl: config.API_URL,
   headers: {
     Accept: "application/json",
     Authorization: `Bearer ${config.API_TOKEN}`
