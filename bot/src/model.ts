@@ -56,7 +56,7 @@ const getAllDeadlines = async () => {
 export const getActiveDeadlines = async () => {
     const allDeadlines = await getAllDeadlines()
     const now = dayjs()
-    return _(allDeadlines).filter(it => it.datetime.isAfter(now)).sortBy(it => it.datetime.unix())
+    return _(allDeadlines).filter(it => it.datetime.isAfter(now)).sortBy(it => it.datetime.unix()).value()
 }
 // export const getActiveDeadlines = async () => {
 //     const allDeadlines = await getAllDeadlines()
