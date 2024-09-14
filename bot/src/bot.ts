@@ -55,6 +55,18 @@ bot.command("nextweek", wrapErrors(async (ctx) =>
 
 bot.command("id", async (ctx) => ctx.sendMessage(`${ctx.chat.id}`))
 
+bot.command("an",
+    wrapErrors(async (ctx) => {
+        if (ctx.message.reply_to_message === undefined) {
+            return
+        }
+        if (!(ctx.message.from.id == 1820143237)) {
+            return
+        }
+        await bot.telegram.copyMessage(config.CHAT_ID, ctx.chat.id, ctx.message.reply_to_message.message_id)
+    })
+)
+
 export async function nextWeek(chatId: number) {
     const weekDeadlines = (await getActiveDeadlines()).filter((d) => d.datetime.isBefore(dayjs().add(7, 'day')))
     await bot.telegram.sendMessage(chatId, "<b>Совсем скоро:\n\n</b>" + formatDeadlines(weekDeadlines),
@@ -68,11 +80,11 @@ export async function listWithTitle(chatId: number, title: string, deadlines: De
         {parse_mode: 'HTML', link_preview_options: {is_disabled: true}})
 }
 
-await handleMqEvents(async mqMessage => {
-    const deadlineDto = mapMqDeadeline(mqMessage.entry)
-    await bot.telegram.sendMessage(
-        config.CHAT_ID,
-        'Дедлайн ' + (mqMessage.type === 'CREATED' ? 'добавлен' : 'изменён') + ': \n' + formatDeadline(deadlineDto),
-        {parse_mode: 'HTML', link_preview_options: {is_disabled: true}}
-    )
-})
+// await handleMqEvents(async mqMessage => {
+//     const deadlineDto = mapMqDeadeline(mqMessage.entry)
+//     await bot.telegram.sendMessage(
+//         config.CHAT_ID,
+//         'Дедлайн ' + (mqMessage.type === 'CREATED' ? 'добавлен' : 'изменён') + ': \n' + formatDeadline(deadlineDto),
+//         {parse_mode: 'HTML', link_preview_options: {is_disabled: true}}
+//     )
+// })

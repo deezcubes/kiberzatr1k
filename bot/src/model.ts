@@ -55,26 +55,6 @@ const getAllDeadlines = async () => {
 }
 
 export const getActiveDeadlines = async () => {
-    if (config.MOCK_UP) {
-        return [
-            <DeadlineDto>{
-                id: 1,
-                name: 'Отчислиться',
-                subject: 'Надо',
-                datetime: dayjs().add(30, 'second'),
-                comment: 'бляя..',
-                link: 'https://etu.ru'
-            },
-            <DeadlineDto>{
-                id: 2,
-                name: 'я хз',
-                subject: 'чзх',
-                datetime: dayjs().add(30, 'minute'),
-                comment: null,
-                link: null
-            },
-        ]
-    }
     const allDeadlines = await getAllDeadlines()
     const now = dayjs()
     return _(allDeadlines).filter(it => it.datetime.isAfter(now)).sortBy(it => it.datetime.unix()).value()
@@ -84,7 +64,7 @@ export const getActiveDeadlines = async () => {
 export function formatDeadline(deadline: DeadlineDto): string {
     return `` + `<b>${deadline.subject ?? 'неизвестная хуйня'}</b> - ${deadline.name}
 ⏰ ${deadline.datetime.format('DD.MM.YY HH:mm')} <i>(${deadline.datetime.fromNow()})</i>
-` + (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>` + '\n' : ``) + (deadline.comment ? `<i>${deadline.comment}</i>` : ``)
+` + (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>` + '\n' : ``) + (deadline.comment ?? ``)
 }
 
 export function formatDeadlines(deadlines: DeadlineDto[]): string {
