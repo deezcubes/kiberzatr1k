@@ -8,6 +8,7 @@ import 'dayjs/locale/ru.js'
 import {bot} from "./bot";
 import {startJobs} from "./cron";
 
+console.log('Start up...')
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)

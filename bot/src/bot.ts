@@ -1,5 +1,5 @@
 import {Telegraf} from "telegraf";
-import {formatDeadline, formatDeadlines, getActiveDeadlines, mapMqDeadeline} from "./model";
+import {DeadlineDto, formatDeadline, formatDeadlines, getActiveDeadlines, mapMqDeadeline} from "./model";
 import {config} from "./config";
 import {handleMqEvents} from './mq'
 import dayjs from "dayjs";
@@ -58,6 +58,13 @@ bot.command("id", async (ctx) => ctx.sendMessage(`${ctx.chat.id}`))
 export async function nextWeek(chatId: number) {
     const weekDeadlines = (await getActiveDeadlines()).filter((d) => d.datetime.isBefore(dayjs().add(7, 'day')))
     await bot.telegram.sendMessage(chatId, "<b>Совсем скоро:\n\n</b>" + formatDeadlines(weekDeadlines),
+        {parse_mode: 'HTML', link_preview_options: {is_disabled: true}})
+}
+
+export async function listWithTitle(chatId: number, title: string, deadlines: DeadlineDto[]) {
+    await bot.telegram.sendMessage(chatId, `<b>${title}</b>
+
+` + formatDeadlines(deadlines),
         {parse_mode: 'HTML', link_preview_options: {is_disabled: true}})
 }
 

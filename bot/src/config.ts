@@ -5,7 +5,8 @@ export interface Config {
     API_TOKEN: string,
     AMQP_URL: string
     API_URL: string,
-    CHAT_ID: number
+    CHAT_ID: number,
+    MOCK_UP: boolean
 }
 
 export const config: Config = <Config>{
@@ -13,5 +14,6 @@ export const config: Config = <Config>{
     API_TOKEN: process.env.API_TOKEN,
     AMQP_URL: process.env.AMQP_URL,
     API_URL: process.env.API_URL,
-    CHAT_ID: Number(process.env.CHAT_ID)
+    CHAT_ID: Number(process.env.CHAT_ID),
+    MOCK_UP: Boolean(process.env.MOCK_UP)
 }

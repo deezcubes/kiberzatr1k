@@ -4,6 +4,7 @@ import {Deadline, fetchDeadlines} from "./api";
 import sanitizeHtml from "sanitize-html";
 import {DeadlineMqDto} from "./mq";
 import _ from 'lodash'
+import {config} from "./config";
 
 marked.use({
     tokenizer: {
@@ -54,42 +55,36 @@ const getAllDeadlines = async () => {
 }
 
 export const getActiveDeadlines = async () => {
+    if (config.MOCK_UP) {
+        return [
+            <DeadlineDto>{
+                id: 1,
+                name: 'Отчислиться',
+                subject: 'Надо',
+                datetime: dayjs().add(30, 'second'),
+                comment: 'бляя..',
+                link: 'https://etu.ru'
+            },
+            <DeadlineDto>{
+                id: 2,
+                name: 'я хз',
+                subject: 'чзх',
+                datetime: dayjs().add(30, 'minute'),
+                comment: null,
+                link: null
+            },
+        ]
+    }
     const allDeadlines = await getAllDeadlines()
     const now = dayjs()
     return _(allDeadlines).filter(it => it.datetime.isAfter(now)).sortBy(it => it.datetime.unix()).value()
 }
-// export const getActiveDeadlines = async () => {
-//     const allDeadlines = await getAllDeadlines()
-//     const now = dayjs()
-//     return allDeadlines.filter(it => it.datetime.isAfter(now)).sort((a, b) => a.datetime.diff(b.datetime))
-// }
 
-/**
- * This is a mock
- */
-// export function getActiveDeadlines() : DeadlineDto[] {
-//     return [
-//         <DeadlineDto>{
-//             name: 'Отчислиться',
-//             subject: 'Надо',
-//             datetime: dayjs().add(1, 'day').set('h', 15).set('m', 0),
-//             comment: 'бляя..',
-//             link: 'https://etu.ru'
-//         },
-//         <DeadlineDto>{
-//             name: 'я хз',
-//             subject: 'чзх',
-//             datetime: dayjs().add(2, 'day').set('h', 15).set('m', 0),
-//             comment: null,
-//             link: null
-//         },
-//     ]
-// }
 
 export function formatDeadline(deadline: DeadlineDto): string {
     return `` + `<b>${deadline.subject ?? 'неизвестная хуйня'}</b> - ${deadline.name}
 ⏰ ${deadline.datetime.format('DD.MM.YY HH:mm')} <i>(${deadline.datetime.fromNow()})</i>
-` + (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>` + '\n' : ``) + (deadline.comment ? deadline.comment : ``)
+` + (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>` + '\n' : ``) + (deadline.comment ? `<i>${deadline.comment}</i>` : ``)
 }
 
 export function formatDeadlines(deadlines: DeadlineDto[]): string {
