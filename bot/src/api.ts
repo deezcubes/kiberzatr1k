@@ -21,6 +21,17 @@ export const fetchDeadlines = async () =>
         populate: 'subject'
       }
     }
-  }).then(it => it.data!.data!), {
+  })
+      .then(async result => {
+        if (!result.response.ok) {
+          throw Error('Response not successful: ' + JSON.stringify({
+            status: result.response.status,
+            statusText: result.response.statusText,
+            response: await result.response.text().catch(err => 'Failed to load body: ' + err)
+          }))
+        }
+        return result
+      })
+      .then(it => it.data!.data!), {
     milliseconds: 5 * 1000
   })

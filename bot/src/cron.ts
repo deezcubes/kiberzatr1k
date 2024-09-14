@@ -8,18 +8,33 @@ const remindersConfig: { value: number, unit: ManipulateType, name: string }[] =
     {value: 1, unit: 'hour', name: 'Через час дедлайн(ы):'},
 ]
 
-export function defineJobs() {
+const cronJobs = [
     new CronJob(
-        '0 6 * * *',
-        function () {
-            nextWeek(config.CHAT_ID)
-        },
-        null,
-        true
-    );
+        '0 8 * * *',
+        async () => {
+            // TODO печатаем все на сегодня
+        }
+    ),
+    new CronJob(
+        '0 16 * * *',
+        async () => {
+            // todo печатаем оставшиеся на сегодня и все на завтра
+        }
+    ),
+    new CronJob(
+        '0 20 * * 6',
+        async () => {
+            // todo печатаем все на неделю
+        }
+    ),
+    new CronJob(
+        '* * * * *',
+        async () => {
+            // todo reminder checker
+        }
+    )
+]
 
-    // TO DO: Make a job to remind
-    // new CronJob(
-    //     '0 6 * * *'
-    // )
+export function startJobs() {
+    cronJobs.forEach(it => it.start())
 }

@@ -1,0 +1,79 @@
+volumes:
+  lavinmq:
+    external: true
+  postgres:
+    external: true
+  caddy_data:
+    external: true
+  caddy_config: null
+
+services:
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: admin
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - postgres:/var/lib/postgresql/data
+  lavinmq:
+    image: cloudamqp/lavinmq
+    restart: unless-stopped
+    shm_size: 128mb
+    volumes:
+      - lavinmq:/var/lib/lavinmq
+  strapi:
+    build: ../../admin
+    restart: unless-stopped
+    shm_size: 128mb
+    depends_on:
+      - postgres
+      - lavinmq
+    environment:
+      APP_KEYS: ${STRAPI_APP_KEYS}
+      API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
+      JWT_SECRET: ${STRAPI_JWT_SECRET}
+      PUBLIC_URL: ${PUBLIC_URL}
+      # Database
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: admin
+      DATABASE_USERNAME: admin
+      DATABASE_PASSWORD: admin
+      DATABASE_SSL: false
+      CLOUDAMQP_URL: amqp://guest:guest@lavinmq
+  bot:
+    build: ../../bot
+    restart: unless-stopped
+    shm_size: 128mb
+    depends_on:
+      - strapi
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      API_TOKEN: ${API_TOKEN}
+      API_URL: http://strapi:1337/api
+      AMQP_URL: amqp://guest:guest@lavinmq
+      CHAT_ID: ${CHAT_ID}
+  caddy:
+    image: caddy
+    restart: unless-stopped
+    shm_size: 128mb
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+

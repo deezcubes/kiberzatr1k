@@ -1,5 +1,5 @@
 import {Telegraf} from "telegraf";
-import {formatDeadlines, getActiveDeadlines, mapMqDeadeline} from "./model";
+import {formatDeadline, formatDeadlines, getActiveDeadlines, mapMqDeadeline} from "./model";
 import {config} from "./config";
 import {handleMqEvents} from './mq'
 import dayjs from "dayjs";
@@ -39,29 +39,33 @@ const wrapErrors = (fn: (ctx: any) => Promise<void>) => async (ctx: any) => {
 
 bot.command("remind", wrapErrors(async (ctx) => {
     const activeDeadlines = await getActiveDeadlines()
-    await ctx.reply("<b>Список дедлайнов:\n\n</b>" + formatDeadlines(activeDeadlines), {parse_mode: 'HTML', disable_web_page_preview: true})
+    await ctx.reply("<b>Список дедлайнов:\n\n</b>" + formatDeadlines(activeDeadlines), {
+        parse_mode: 'HTML',
+        disable_web_page_preview: true
+    })
 }))
 
 bot.hears(/^[дД]+[аА]+$/, async (ctx) => {
     await ctx.sendVoice({source: './assets/pizda.ogg'})
 })
 
-bot.command("nextweek", wrapErrors( async (ctx) =>
+bot.command("nextweek", wrapErrors(async (ctx) =>
     nextWeek(ctx.chat.id)
 ))
 
 bot.command("id", async (ctx) => ctx.sendMessage(`${ctx.chat.id}`))
 
 export async function nextWeek(chatId: number) {
-    const weekDeadlines = getActiveDeadlines().filter((d) => d.datetime.isBefore(dayjs().add(7, 'day')))
-    await bot.telegram.sendMessage(chatId,"<b>Совсем скоро:\n\n</b>" + formatDeadlines(weekDeadlines),
+    const weekDeadlines = (await getActiveDeadlines()).filter((d) => d.datetime.isBefore(dayjs().add(7, 'day')))
+    await bot.telegram.sendMessage(chatId, "<b>Совсем скоро:\n\n</b>" + formatDeadlines(weekDeadlines),
         {parse_mode: 'HTML', link_preview_options: {is_disabled: true}})
 }
 
 await handleMqEvents(async mqMessage => {
     const deadlineDto = mapMqDeadeline(mqMessage.entry)
-    console.info({
-        type: mqMessage.type,
-        deadlineDto
-    })
+    await bot.telegram.sendMessage(
+        config.CHAT_ID,
+        'Дедлайн ' + (mqMessage.type === 'CREATED' ? 'добавлен' : 'изменён') + ': \n' + formatDeadline(deadlineDto),
+        {parse_mode: 'HTML', link_preview_options: {is_disabled: true}}
+    )
 })

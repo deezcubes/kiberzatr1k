@@ -89,14 +89,12 @@ export const getActiveDeadlines = async () => {
 export function formatDeadline(deadline: DeadlineDto): string {
     return `` + `<b>${deadline.subject ?? 'неизвестная хуйня'}</b> - ${deadline.name}
 ⏰ ${deadline.datetime.format('DD.MM.YY HH:mm')} <i>(${deadline.datetime.fromNow()})</i>
-` + (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>` + '\n' : ``) + (deadline.comment ? `<i>${deadline.comment}</i>` : ``)
+` + (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>` + '\n' : ``) + (deadline.comment ? deadline.comment : ``)
 }
 
 export function formatDeadlines(deadlines: DeadlineDto[]): string {
-    return deadlines.reduce(
-        (prev, curr, idx) => {
-            return prev + (idx + 1) + '. ' + formatDeadline(curr) + '\n\n'
-        },
-        ''
-    ).trim()
+    if (deadlines.length === 0) {
+        return 'ничево нет...'
+    }
+    return deadlines.map((curr, idx) => (idx + 1) + '. ' + formatDeadline(curr)).join('\n\n')
 }
