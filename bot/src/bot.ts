@@ -80,11 +80,11 @@ export async function listWithTitle(chatId: number, title: string, deadlines: De
         {parse_mode: 'HTML', link_preview_options: {is_disabled: true}})
 }
 
-// await handleMqEvents(async mqMessage => {
-//     const deadlineDto = mapMqDeadeline(mqMessage.entry)
-//     await bot.telegram.sendMessage(
-//         config.CHAT_ID,
-//         'Дедлайн ' + (mqMessage.type === 'CREATED' ? 'добавлен' : 'изменён') + ': \n' + formatDeadline(deadlineDto),
-//         {parse_mode: 'HTML', link_preview_options: {is_disabled: true}}
-//     )
-// })
+await handleMqEvents(async mqMessage => {
+    const deadlineDto = mapMqDeadeline(mqMessage.entry)
+    await bot.telegram.sendMessage(
+        config.CHAT_ID,
+        'Дедлайн ' + (mqMessage.type === 'CREATED' ? 'добавлен' : 'изменён') + ': \n' + formatDeadline(deadlineDto),
+        {parse_mode: 'HTML', link_preview_options: {is_disabled: true}}
+    )
+})
