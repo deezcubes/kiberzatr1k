@@ -50,7 +50,7 @@ export function mapMqDeadeline(deadline: DeadlineMqDto): DeadlineDto {
     }
 }
 
-async function getAllDeadlines() {
+export async function getAllDeadlines() {
     const apiDeadlines = await fetchDeadlines()
     return apiDeadlines.map(deadline => mapDeadline(<number>deadline.id, <Deadline>deadline.attributes))
 }

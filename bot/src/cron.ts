@@ -2,7 +2,7 @@ import {CronJob} from "cron";
 import {listWithTitle} from "./bot";
 import {config} from "./config";
 import dayjs, {ManipulateType} from "dayjs";
-import {getActiveDeadlines} from "./model";
+import {getActiveDeadlines, getAllDeadlines} from "./model";
 import fs from "node:fs";
 
 interface Reminder {
@@ -77,7 +77,7 @@ const cronJobs = [
     new CronJob(
         '* * * * *',
         async () => {
-            const deadlines = await getActiveDeadlines();
+            const deadlines = await getAllDeadlines();
             const jsonData = readFileData()
             for (const remind of remindersConfig) {
                 const reminderId = getReminderId(remind)

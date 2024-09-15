@@ -12,6 +12,7 @@ function main() {
     console.log('Start up...')
     dayjs.extend(utc)
     dayjs.extend(timezone)
+    dayjs.tz.setDefault('Europe/Moscow')
     dayjs.extend(customParseFormat)
     dayjs.extend(relativeTime)
     dayjs.locale('ru')
