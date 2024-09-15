@@ -89,7 +89,7 @@ const cronJobs = [
                     d => d.datetime.isBefore(
                         dayjs().add(remind.value, remind.unit)
                     )
-                ).filter(d => !(d.id in deadlineList));
+                ).filter(d => !deadlineList.includes(d.id));
                 deadlineList.push(...remindList.map(it => it.id))
                 if (remindList.length !== 0) {
                     await listWithTitle(config.CHAT_ID,
