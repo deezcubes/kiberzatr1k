@@ -5,19 +5,23 @@ import timezone from "dayjs/plugin/timezone.js";
 import relativeTime from "dayjs/plugin/relativeTime.js"
 import customParseFormat from "dayjs/plugin/customParseFormat.js"
 import 'dayjs/locale/ru.js'
-import {bot} from "./bot";
+import {launch} from "./bot";
 import {startJobs} from "./cron";
 
-console.log('Start up...')
-dayjs.extend(utc)
-dayjs.extend(timezone)
-dayjs.extend(customParseFormat)
-dayjs.extend(relativeTime)
-dayjs.locale('ru')
+function main() {
+    console.log('Start up...')
+    dayjs.extend(utc)
+    dayjs.extend(timezone)
+    dayjs.extend(customParseFormat)
+    dayjs.extend(relativeTime)
+    dayjs.locale('ru')
 
-bot.launch()
-startJobs()
+    launch().then(
+        () => { console.log('Bot launched'); },
+        (err: unknown) => { console.error('Failed to launch bot: ' + String(err)) }
+    )
+    startJobs()
+}
 
-// Enable graceful stop
-process.once('SIGINT', () => bot.stop('SIGINT'))
-process.once('SIGTERM', () => bot.stop('SIGTERM'))
+main()
+

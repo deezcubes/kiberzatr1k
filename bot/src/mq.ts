@@ -23,9 +23,10 @@ export const handleMqEvents = async (callback: (message: MqMessage) => Promise<v
     const channel = await connection.channel()
     const queue = await channel.queue('updates', {durable: true})
 
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     await queue.subscribe({}, async (msg) => {
         try {
-            const mqMessage = <MqMessage>JSON.parse(msg.bodyString()!)
+            const mqMessage = <MqMessage>JSON.parse(<string>msg.bodyString())
             await callback(mqMessage)
         } catch (e) {
             console.error('Error while receiving mq message', e)

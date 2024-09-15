@@ -15,6 +15,8 @@ ENV PATH /opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
 COPY . .
 RUN yarn build
+WORKDIR /opt/app/src/plugins/mq
+RUN yarn build
 
 # Creating final production image
 FROM --platform=linux/amd64 node:18.18-alpine3.17

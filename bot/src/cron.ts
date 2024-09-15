@@ -1,14 +1,43 @@
 import {CronJob} from "cron";
-import {listWithTitle, nextWeek} from "./bot";
+import {listWithTitle} from "./bot";
 import {config} from "./config";
 import dayjs, {ManipulateType} from "dayjs";
 import {getActiveDeadlines} from "./model";
-import {readFileSync, writeFileSync} from "node:fs";
+import fs from "node:fs";
 
-const remindersConfig: { value: string, unit: ManipulateType, name: string }[] = [
-    {value: "0", unit: 'minute', name: '‼️ Прямо сейчас наступают дедлайн(ы):'},
-    {value: "1", unit: 'hour', name: '‼️ Через час наступят дедлайн(ы):'},
+interface Reminder {
+    value: number,
+    unit: ManipulateType,
+    name: string
+}
+
+function getReminderId(reminder: Reminder): string {
+    return String(reminder.value) + '_' + reminder.unit
+}
+
+const remindersConfig: Reminder[] = [
+    {value: 0, unit: 'minute', name: '‼️ Прямо сейчас наступают дедлайн(ы):'},
+    {value: 1, unit: 'hour', name: '‼️ Через час наступят дедлайн(ы):'},
 ]
+
+interface FileData {
+    [key: string]: number[]
+}
+
+const FILE_DATA_PATH = './data/remind.json'
+
+function readFileData(): FileData {
+    if (!fs.existsSync(FILE_DATA_PATH)) {
+        return {}
+    }
+
+    const rawData = fs.readFileSync(FILE_DATA_PATH, 'utf-8');
+    return <FileData>JSON.parse(rawData);
+}
+
+function writeFileData(data: FileData) {
+    fs.writeFileSync(FILE_DATA_PATH, JSON.stringify(data), 'utf-8')
+}
 
 const cronJobs = [
     new CronJob(
@@ -48,29 +77,32 @@ const cronJobs = [
     new CronJob(
         '* * * * *',
         async () => {
-            const fileData = readFileSync('./data/remind.json', 'utf-8');
-            const jsonData: { [key: string]: [number]} = JSON.parse(fileData);
             const deadlines = await getActiveDeadlines();
-            console.log(deadlines)
+            const jsonData = readFileData()
             for (const remind of remindersConfig) {
+                const reminderId = getReminderId(remind)
+                if (!(reminderId in jsonData)) {
+                    jsonData[reminderId] = []
+                }
+                const deadlineList = <number[]>jsonData[reminderId]
                 const remindList = deadlines.filter(
                     d => d.datetime.isBefore(
-                        dayjs().add(1, remind.unit)
+                        dayjs().add(remind.value, remind.unit)
                     )
-                ).filter(d => !(d.id in jsonData[remind.value]));
-                remindList.forEach(d => jsonData[remind.value].push(d.id))
-                writeFileSync('./data/remind.json', JSON.stringify(jsonData))
-                if (remindList.length != 0) {
+                ).filter(d => !(d.id in deadlineList));
+                deadlineList.push(...remindList.map(it => it.id))
+                if (remindList.length !== 0) {
                     await listWithTitle(config.CHAT_ID,
                         remind.name,
                         remindList
                     )
                 }
             }
+            writeFileData(jsonData)
         }
     ),
 ]
 
 export function startJobs() {
-    cronJobs.forEach(it => it.start())
+    cronJobs.forEach(it => { it.start(); })
 }

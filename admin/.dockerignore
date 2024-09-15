@@ -1,2 +1,5 @@
 **/node_modules
 .env
+dist
+src/plugins/mq/dist
+.strapi

@@ -4,7 +4,6 @@ import {Deadline, fetchDeadlines} from "./api";
 import sanitizeHtml from "sanitize-html";
 import {DeadlineMqDto} from "./mq";
 import _ from 'lodash'
-import {config} from "./config";
 
 marked.use({
     tokenizer: {
@@ -23,38 +22,40 @@ export interface DeadlineDto {
     link: string | null
 }
 
-const formatComment = (comment: string | null) => comment ? sanitizeHtml(marked.parse(comment) as string, {
-    allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'span', 'tg-spoiler', 'a', 'tg-emoji', 'code', 'pre', 'blockquote']
-}) : null
+function formatComment(comment: (string | null)): string | null {
+    return comment
+        ? sanitizeHtml(marked.parse(comment) as string, {allowedTags: ['b', 'strong', 'i', 'em', 'u', 'ins', 's', 'strike', 'del', 'span', 'tg-spoiler', 'a', 'tg-emoji', 'code', 'pre', 'blockquote']})
+        : null
+}
 
-const mapDeadline = (id: number, deadline: Deadline) => {
-    return (<DeadlineDto>{
+function mapDeadline(id: number, deadline: Deadline): DeadlineDto {
+    return {
         id,
         name: deadline.name,
         subject: deadline.subject?.data?.attributes?.name ?? null,
         datetime: dayjs(deadline.datetime),
         comment: formatComment(deadline.comment ?? null),
-        link: deadline.link
-    });
+        link: deadline.link ?? null
+    };
 }
 
-export const mapMqDeadeline = (deadline: DeadlineMqDto) => {
-    return (<DeadlineDto>{
+export function mapMqDeadeline(deadline: DeadlineMqDto): DeadlineDto {
+    return {
         id: deadline.id,
         name: deadline.name,
         subject: deadline.subject,
         datetime: dayjs(deadline.datetime),
         comment: formatComment(deadline.comment),
         link: deadline.link
-    })
+    }
 }
 
-const getAllDeadlines = async () => {
+async function getAllDeadlines() {
     const apiDeadlines = await fetchDeadlines()
-    return apiDeadlines.map(deadline => mapDeadline(deadline.id!, deadline.attributes!))
+    return apiDeadlines.map(deadline => mapDeadline(<number>deadline.id, <Deadline>deadline.attributes))
 }
 
-export const getActiveDeadlines = async () => {
+export async function getActiveDeadlines() {
     const allDeadlines = await getAllDeadlines()
     const now = dayjs()
     return _(allDeadlines).filter(it => it.datetime.isAfter(now)).sortBy(it => it.datetime.unix()).value()
@@ -71,5 +72,5 @@ export function formatDeadlines(deadlines: DeadlineDto[]): string {
     if (deadlines.length === 0) {
         return 'ничево нет...'
     }
-    return deadlines.map((curr, idx) => (idx + 1) + '. ' + formatDeadline(curr)).join('\n\n')
+    return deadlines.map((curr, idx) => String(idx + 1) + '. ' + formatDeadline(curr)).join('\n\n')
 }

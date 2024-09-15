@@ -5,6 +5,8 @@ volumes:
     external: true
   caddy_data:
     external: true
+  bot_data:
+    external: true
   caddy_config: null
 
 services:
@@ -19,19 +21,33 @@ services:
       POSTGRES_PASSWORD: admin
     volumes:
       - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d admin" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_interval: 5s
   lavinmq:
     image: cloudamqp/lavinmq
     restart: unless-stopped
     shm_size: 128mb
     volumes:
       - lavinmq:/var/lib/lavinmq
+    healthcheck:
+      test: ["CMD", "/usr/bin/lavinmqctl", "status"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_interval: 5s
   strapi:
     build: ../../admin
     restart: unless-stopped
     shm_size: 128mb
     depends_on:
-      - postgres
-      - lavinmq
+      postgres:
+        condition: service_healthy
+      lavinmq:
+        condition: service_healthy
     environment:
       APP_KEYS: ${STRAPI_APP_KEYS}
       API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
@@ -48,18 +64,27 @@ services:
       DATABASE_PASSWORD: admin
       DATABASE_SSL: false
       CLOUDAMQP_URL: amqp://guest:guest@lavinmq
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 -S --spider 127.0.0.1:1337/_health || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_interval: 5s
   bot:
     build: ../../bot
     restart: unless-stopped
     shm_size: 128mb
     depends_on:
-      - strapi
+      strapi:
+        condition: service_healthy
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
       API_TOKEN: ${API_TOKEN}
       API_URL: http://strapi:1337/api
       AMQP_URL: amqp://guest:guest@lavinmq
       CHAT_ID: ${CHAT_ID}
+    volumes:
+      - bot_data:/opt/app/data
   caddy:
     image: caddy
     restart: unless-stopped
