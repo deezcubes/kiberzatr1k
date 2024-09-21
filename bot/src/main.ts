@@ -15,7 +15,7 @@ function main() {
     dayjs.tz.setDefault('Europe/Moscow')
     dayjs.extend(customParseFormat)
     dayjs.extend(relativeTime)
-    dayjs.locale('ru')
+    dayjs.locale('ru');
 
     launch().then(
         () => { console.log('Bot launched'); },

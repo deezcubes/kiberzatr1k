@@ -7,6 +7,36 @@ import {config} from "./config";
 export type DeadlineResponseDataObject = components['schemas']['DeadlineResponseDataObject']
 export type Deadline = components['schemas']['Deadline']
 
+export interface EtuApiParamsResponseDataObject {
+    week: number
+}
+
+export type EtuApiScheduleResponseDataObject = [{
+    scheduleObjects: Array<{
+        form: string,
+        block: string | null,
+        lesson: {
+            subject: {
+                title: string,
+                shortTitle: string,
+                subjectType: string,
+            },
+            teacher: {
+                initials: string | null
+            } | null,
+            auditoriumReservation: {
+                auditoriumNumber: string | null,
+                reservationTime: {
+                    startTime: number,
+                    endTime: number,
+                    weekDay: string,
+                    week: string
+                }
+            }
+        }
+    }>
+}]
+
 const client = createClient<paths>({
     baseUrl: config.API_URL,
     headers: {
@@ -15,7 +45,7 @@ const client = createClient<paths>({
     },
 });
 
-export async function fetchDeadlines (): Promise<DeadlineResponseDataObject[]> {
+export async function fetchDeadlines(): Promise<DeadlineResponseDataObject[]> {
     return pTimeout(client.GET('/deadlines', {
         params: {
             query: {
@@ -42,4 +72,41 @@ export async function fetchDeadlines (): Promise<DeadlineResponseDataObject[]> {
         }), {
         milliseconds: 5 * 1000
     })
+}
+
+async function etuApiRequest<T>(input: string, init?: RequestInit): Promise<T> {
+    const promise = fetch(input, init)
+        .then(async result => {
+            if (!result.ok) {
+                throw Error('Response not successful: ' + JSON.stringify({
+                    status: result.status,
+                    statusText: result.statusText,
+                    response: await result.text().catch((err: unknown) => 'Failed to load body: ' + String(err))
+                }))
+            }
+            return (await result.json()) as T
+        })
+
+    return pTimeout(promise, {milliseconds: 5000})
+}
+
+export async function fetchEtuParams() {
+    return await etuApiRequest<EtuApiParamsResponseDataObject>('https://digital.etu.ru/api/general/current')
+}
+
+export async function fetchEtuSchedule() {
+    return await etuApiRequest<EtuApiScheduleResponseDataObject>('https://digital.etu.ru/api/schedule/objects/publicated?' + new URLSearchParams([
+        ['subjectType', 'Лек'],
+        ['subjectType', 'Пр'],
+        ['subjectType', 'Лаб'],
+        ['subjectType', 'КП'],
+        ['subjectType', 'КР'],
+        ['subjectType', 'Доб'],
+        ['subjectType', 'МЭк'],
+        ['subjectType', 'Прак'],
+        ['subjectType', 'Тест'],
+        ['groups', '5115'],
+        ['withSubjectCode', 'true'],
+        ['withURL', 'true'],
+    ]).toString())
 }

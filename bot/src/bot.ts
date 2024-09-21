@@ -11,55 +11,67 @@ interface MaybeError {
     cause?: MaybeError
 }
 
-function wrapErrors<T>(fn: (ctx: T) => Promise<void>): (ctx: T) => Promise<void> {
+export async function reportError(e: unknown, chatId: number, title: string) {
+    try {
+        let currentError = e as MaybeError | undefined
+        const traceList = []
+        while (currentError) {
+            const stack = currentError['stack']
+            if (stack) {
+                traceList.push(stack)
+            } else {
+                traceList.push(currentError)
+            }
+            currentError = currentError['cause']
+        }
+
+        await bot.telegram.sendMessage(chatId, `я поел говна (${title}): 
+\`\`\`
+${traceList.join('\n')}
+\`\`\``, {
+            parse_mode: 'MarkdownV2'
+        })
+    } catch (e) {
+        console.error('Error while sending error message', e)
+    } finally {
+        console.error('Error while handling command', e)
+    }
+}
+
+function wrapErrors<T>(title: string, fn: (ctx: T) => Promise<void>): (ctx: T) => Promise<void> {
     return async function (ctx) {
         try {
             await fn(ctx)
-        } catch (e) {
-            try {
-                let currentError = e as MaybeError | undefined
-                const traceList = []
-                while (currentError) {
-                    const stack = currentError['stack']
-                    if (stack) {
-                        traceList.push(stack)
-                    } else {
-                        traceList.push(currentError)
-                    }
-                    currentError = currentError['cause']
-                }
-                // @ts-expect-error yeah so we know here that ctx has the reply method, but i'm lazy to type check it
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                await ctx.reply('я поел говна: \n' + '```\n' + traceList.join('\n') + '\n```', {
-                    parse_mode: 'MarkdownV2'
-                })
-            } catch (e) {
-                console.error('Error while sending error message', e)
-            } finally {
-                console.error('Error while handling command', e)
-            }
+        } catch (e: unknown) {
+            // @ts-expect-error i'm too lazy to type config here
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
+            await reportError(e, ctx.chat.id, title)
         }
     }
 }
 
-bot.command("remind", wrapErrors(async (ctx) => {
-    const activeDeadlines = await getActiveDeadlines()
-    await ctx.reply("<b>Список дедлайнов:\n\n</b>" + formatDeadlines(activeDeadlines), {
-        parse_mode: 'HTML',
-        link_preview_options: {is_disabled: true}
-    })
+bot.command("remind", wrapErrors('/remind', async (ctx) => {
+    await listWithTitle(
+        ctx.chat.id,
+        'Список дедлайнов',
+        await getActiveDeadlines()
+    )
 }))
 
-bot.hears(/^д+а+$/i, async (ctx) => {
+bot.hears(/^д+а+$/i, wrapErrors('да', async (ctx) => {
     await ctx.sendVoice({source: './assets/pizda.ogg'})
-})
+}))
 
-bot.command("nextweek", wrapErrors(async (ctx) =>
-    nextWeek(ctx.chat.id)
-))
+bot.command("nextweek", wrapErrors('/nextweek', async (ctx) => {
+    await listWithTitle(
+        ctx.chat.id,
+        'Совсем скоро',
+        (await getActiveDeadlines()).filter((d) => d.datetime.isBefore(dayjs().add(7, 'day')))
+    );
+}))
 
 bot.command("an",
-    wrapErrors(async (ctx) => {
+    wrapErrors('/an', async (ctx) => {
         if (ctx.message.reply_to_message === undefined) {
             return
         }
@@ -71,15 +83,20 @@ bot.command("an",
     })
 )
 
-export async function nextWeek(chatId: number) {
-    const weekDeadlines = (await getActiveDeadlines()).filter((d) => d.datetime.isBefore(dayjs().add(7, 'day')))
-    await bot.telegram.sendMessage(chatId, "<b>Совсем скоро:\n\n</b>" + formatDeadlines(weekDeadlines),
-        {parse_mode: 'HTML', link_preview_options: {is_disabled: true}})
-}
-
 export async function listWithTitle(chatId: number, title: string, deadlines: DeadlineDto[]) {
     await bot.telegram.sendMessage(chatId, `<b>${title}</b>` + '\n\n' + formatDeadlines(deadlines),
         {parse_mode: 'HTML', link_preview_options: {is_disabled: true}})
+}
+
+export async function listSchedule(chatId: number, schedule: string) {
+    const message = await bot.telegram.sendMessage(
+        chatId,
+        schedule,
+        {parse_mode: 'HTML'}
+    )
+    await bot.telegram.pinChatMessage(chatId, message.message_id, {
+        disable_notification: true
+    })
 }
 
 export async function launch() {
@@ -93,12 +110,17 @@ export async function launch() {
         console.error(err)
     })
     await handleMqEvents(async mqMessage => {
-        const deadlineDto = mapMqDeadeline(mqMessage.entry)
-        await bot.telegram.sendMessage(
-            config.CHAT_ID,
-            'Дедлайн ' + (mqMessage.type === 'CREATED' ? 'добавлен' : 'изменён') + ': \n' + formatDeadline(deadlineDto),
-            {parse_mode: 'HTML', link_preview_options: {is_disabled: true}}
-        )
+        try {
+            const deadlineDto = mapMqDeadeline(mqMessage.entry)
+
+            await bot.telegram.sendMessage(
+                config.CHAT_ID,
+                'Дедлайн ' + (mqMessage.type === 'CREATED' ? 'добавлен' : 'изменён') + ': \n' + formatDeadline(deadlineDto),
+                {parse_mode: 'HTML', link_preview_options: {is_disabled: true}}
+            )
+        } catch (e: unknown) {
+            await reportError(e, config.CHAT_ID, 'handleMqEvents')
+        }
     })
     await bot.launch()
 }

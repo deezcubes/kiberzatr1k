@@ -1,9 +1,10 @@
 import {CronJob} from "cron";
-import {listWithTitle} from "./bot";
+import {listSchedule, listWithTitle, reportError} from "./bot";
 import {config} from "./config";
 import dayjs, {ManipulateType} from "dayjs";
 import {getActiveDeadlines, getAllDeadlines} from "./model";
 import fs from "node:fs";
+import {getCurrentScheduleFormatted} from "./schedule";
 
 interface Reminder {
     value: number,
@@ -43,66 +44,95 @@ const cronJobs = [
     new CronJob(
         '0 6 * * *',
         async () => {
-            const deadlines = await getActiveDeadlines();
-            await listWithTitle(config.CHAT_ID,
-                "‼️ Дедлайны на сегодня:",
-                deadlines.filter(it => it.datetime.isSame(dayjs(), 'date'))
-            )
+            try {
+                const schedule = await getCurrentScheduleFormatted()
+                if (schedule === null) {
+                    return
+                }
+                await listSchedule(config.CHAT_ID, schedule)
+            } catch (e: unknown) {
+                await reportError(e, config.CHAT_ID, 'Обновление расписания')
+            }
+        }
+    ),
+    new CronJob(
+        '0 6 * * *',
+        async () => {
+            try {
+                await listWithTitle(config.CHAT_ID,
+                    "‼️ Дедлайны на сегодня:",
+                    (await getActiveDeadlines()).filter(it => it.datetime.isSame(dayjs(), 'date'))
+                )
+            } catch (e: unknown) {
+                await reportError(e, config.CHAT_ID, 'cron: 0 6 * * *')
+            }
         }
     ),
     new CronJob(
         '0 16 * * *',
         async () => {
-            const deadlines = await getActiveDeadlines();
-            await listWithTitle(config.CHAT_ID,
-                "‼️ Дедлайны на сегодня и завтра:",
-                deadlines.filter(it => it.datetime.isSame(dayjs(), 'date') ||
-                it.datetime.isSame(dayjs().add(1, 'day'), 'date'))
-            )
+            try {
+                await listWithTitle(config.CHAT_ID,
+                    "‼️ Дедлайны на сегодня и завтра:",
+                    (await getActiveDeadlines()).filter(it => it.datetime.isSame(dayjs(), 'date') ||
+                        it.datetime.isSame(dayjs().add(1, 'day'), 'date'))
+                )
+            } catch (e: unknown) {
+                await reportError(e, config.CHAT_ID, 'cron: 0 16 * * *')
+            }
         }
     ),
     new CronJob(
         '0 20 * * 6',
         async () => {
-            const deadlines = await getActiveDeadlines();
-            await listWithTitle(config.CHAT_ID,
-                "‼️ Дедлайны на следующую неделю:",
-                deadlines.filter(it => it.datetime.isBefore(
-                    dayjs().add(8, 'day')
-                        .add(4, 'hour'))
+            try {
+                await listWithTitle(config.CHAT_ID,
+                    "‼️ Дедлайны на следующую неделю:",
+                    (await getActiveDeadlines()).filter(it => it.datetime.isBefore(
+                        dayjs().add(8, 'day')
+                            .add(4, 'hour'))
+                    )
                 )
-            )
+            } catch (e: unknown) {
+                await reportError(e, config.CHAT_ID, 'cron: 0 20 * * 6')
+            }
         }
     ),
     new CronJob(
         '* * * * *',
         async () => {
-            const deadlines = await getAllDeadlines();
-            const jsonData = readFileData()
-            for (const remind of remindersConfig) {
-                const reminderId = getReminderId(remind)
-                if (!(reminderId in jsonData)) {
-                    jsonData[reminderId] = []
+            try {
+                const deadlines = await getAllDeadlines();
+                const jsonData = readFileData()
+                for (const remind of remindersConfig) {
+                    const reminderId = getReminderId(remind)
+                    if (!(reminderId in jsonData)) {
+                        jsonData[reminderId] = []
+                    }
+                    const deadlineList = <number[]>jsonData[reminderId]
+                    const remindList = deadlines.filter(
+                        d => d.datetime.isBefore(
+                            dayjs().add(remind.value, remind.unit)
+                        )
+                    ).filter(d => !deadlineList.includes(d.id));
+                    deadlineList.push(...remindList.map(it => it.id))
+                    if (remindList.length !== 0) {
+                        await listWithTitle(config.CHAT_ID,
+                            remind.name,
+                            remindList
+                        )
+                    }
                 }
-                const deadlineList = <number[]>jsonData[reminderId]
-                const remindList = deadlines.filter(
-                    d => d.datetime.isBefore(
-                        dayjs().add(remind.value, remind.unit)
-                    )
-                ).filter(d => !deadlineList.includes(d.id));
-                deadlineList.push(...remindList.map(it => it.id))
-                if (remindList.length !== 0) {
-                    await listWithTitle(config.CHAT_ID,
-                        remind.name,
-                        remindList
-                    )
-                }
+                writeFileData(jsonData)
+            } catch (e: unknown) {
+                await reportError(e, config.CHAT_ID, 'Обновление дедлайнов')
             }
-            writeFileData(jsonData)
         }
     ),
 ]
 
 export function startJobs() {
-    cronJobs.forEach(it => { it.start(); })
+    cronJobs.forEach(it => {
+        it.start();
+    })
 }
