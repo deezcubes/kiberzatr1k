@@ -32,6 +32,11 @@ ${traceList.join('\n')}
             parse_mode: 'MarkdownV2'
         })
     } catch (e) {
+        try {
+            await bot.telegram.sendMessage('я поел говна и пока пытался сказать как я опять поел говна. втф?')
+        } catch (e) {
+            console.error('Error while sending stripped error message', e)
+        }
         console.error('Error while sending error message', e)
     } finally {
         console.error('Error while handling command', e)
