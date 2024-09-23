@@ -33,7 +33,7 @@ ${traceList.join('\n')}
         })
     } catch (e) {
         try {
-            await bot.telegram.sendMessage('я поел говна и пока пытался сказать как я опять поел говна. втф?')
+            await bot.telegram.sendMessage(chatId, 'я поел говна и пока пытался сказать как я опять поел говна. втф?')
         } catch (e) {
             console.error('Error while sending stripped error message', e)
         }
