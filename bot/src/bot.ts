@@ -25,7 +25,7 @@ export async function reportError(e: unknown, chatId: number, title: string) {
             currentError = currentError['cause']
         }
 
-        await bot.telegram.sendMessage(chatId, `я поел говна (${title}): 
+        await bot.telegram.sendMessage(chatId, `я поел говна \\(${title}\\): 
 \`\`\`
 ${traceList.join('\n')}
 \`\`\``, {
