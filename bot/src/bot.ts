@@ -80,7 +80,7 @@ bot.command("an",
         if (ctx.message.reply_to_message === undefined) {
             return
         }
-        if (!([1820143237, 568977897].includes(ctx.message.from.id))) {
+        if (!([1820143237, 568977897, 847343359].includes(ctx.message.from.id))) {
             console.info('User tried to use /an but has no rights: ' + String(ctx.message.from.id))
             return
         }
