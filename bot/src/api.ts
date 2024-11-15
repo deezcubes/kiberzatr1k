@@ -3,9 +3,14 @@ import type {paths} from './schema.js';
 import type {components} from './schema.js';
 import pTimeout from 'p-timeout';
 import {config} from "./config";
+import {range} from "lodash";
 
 export type DeadlineResponseDataObject = components['schemas']['DeadlineResponseDataObject']
 export type Deadline = components['schemas']['Deadline']
+type DeadlineResponsePage = {
+    data: DeadlineResponseDataObject[],
+    meta: any
+}
 
 export interface EtuApiParamsResponseDataObject {
     week: number
@@ -45,11 +50,14 @@ const client = createClient<paths>({
     },
 });
 
-export async function fetchDeadlines(): Promise<DeadlineResponseDataObject[]> {
+async function fetchDeadlinePage(page: number): Promise<DeadlineResponsePage> {
     return pTimeout(client.GET('/deadlines', {
         params: {
             query: {
-                populate: 'subject'
+                populate: 'subject',
+                pagination: {
+                    page: page
+                }
             }
         }
     })
@@ -68,11 +76,23 @@ export async function fetchDeadlines(): Promise<DeadlineResponseDataObject[]> {
                 }))
             }
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            return result.data!.data as DeadlineResponseDataObject[]
+            return {
+                data: result.data!.data as DeadlineResponseDataObject[],
+                meta: result.data!.meta
+            }
         }), {
         milliseconds: 5 * 1000
     })
 }
+
+export async function fetchDeadlines(): Promise<DeadlineResponseDataObject[]> {
+    const firstPage = await fetchDeadlinePage(0);
+    const otherPages = await Promise.all(
+        range(1, firstPage.meta!.pagination.pageCount).map(it => fetchDeadlinePage(it))
+    );
+    return [...firstPage.data, ...otherPages.flatMap(it => it.data)]
+}
+
 
 async function etuApiRequest<T>(input: string, init?: RequestInit): Promise<T> {
     const promise = fetch(input, init)

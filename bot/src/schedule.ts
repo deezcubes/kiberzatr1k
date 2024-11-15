@@ -45,12 +45,6 @@ function filterDvsLessons(lessons: RichLesson[]): RichLesson[] {
 
     const filteredLessons = lessons
         .filter(({startTime, endTime}) => !dvsLessonTimes.has(JSON.stringify({startTime, endTime})))
-        .map(lesson => {
-            if (lesson.block !== null) {
-                lesson.subject += ' (ДВС' + getDvsNumber(lesson.block) + ')'
-            }
-            return lesson
-        })
 
     filteredLessons.push(...replacedDvsLessons)
 
@@ -78,7 +72,8 @@ function prettifyLesson(lesson: RichLesson): ScheduleLesson {
     }
     const formDictionary: Record<string, string> = {
         'online': 'дистант',
-        'standard': 'очно'
+        'standard': 'очно',
+        'distant': 'дистант'
     }
     const typeDictionary: Record<string, string> = {
         'Пр': 'практика',
