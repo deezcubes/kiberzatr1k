@@ -7,9 +7,11 @@ import {range} from "lodash";
 
 export type DeadlineResponseDataObject = components['schemas']['DeadlineResponseDataObject']
 export type Deadline = components['schemas']['Deadline']
+
+type StrapiMeta = { pagination: { pageCount: number } }
 type DeadlineResponsePage = {
     data: DeadlineResponseDataObject[],
-    meta: any
+    meta: StrapiMeta
 }
 
 export interface EtuApiParamsResponseDataObject {
@@ -75,10 +77,9 @@ async function fetchDeadlinePage(page: number): Promise<DeadlineResponsePage> {
                     data: result.data
                 }))
             }
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return {
-                data: result.data!.data as DeadlineResponseDataObject[],
-                meta: result.data!.meta
+                data: result.data?.data as DeadlineResponseDataObject[],
+                meta: result.data?.meta as StrapiMeta
             }
         }), {
         milliseconds: 5 * 1000
@@ -88,7 +89,7 @@ async function fetchDeadlinePage(page: number): Promise<DeadlineResponsePage> {
 export async function fetchDeadlines(): Promise<DeadlineResponseDataObject[]> {
     const firstPage = await fetchDeadlinePage(0);
     const otherPages = await Promise.all(
-        range(1, firstPage.meta!.pagination.pageCount).map(it => fetchDeadlinePage(it))
+        range(1, firstPage.meta.pagination.pageCount).map(it => fetchDeadlinePage(it))
     );
     return [...firstPage.data, ...otherPages.flatMap(it => it.data)]
 }
