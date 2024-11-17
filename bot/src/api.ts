@@ -3,7 +3,7 @@ import type {paths} from './schema.js';
 import type {components} from './schema.js';
 import pTimeout from 'p-timeout';
 import {config} from "./config";
-import {range} from "lodash";
+import _ from "lodash";
 
 export type DeadlineResponseDataObject = components['schemas']['DeadlineResponseDataObject']
 export type Deadline = components['schemas']['Deadline']
@@ -89,7 +89,7 @@ async function fetchDeadlinePage(page: number): Promise<DeadlineResponsePage> {
 export async function fetchDeadlines(): Promise<DeadlineResponseDataObject[]> {
     const firstPage = await fetchDeadlinePage(0);
     const otherPages = await Promise.all(
-        range(1, firstPage.meta.pagination.pageCount).map(it => fetchDeadlinePage(it))
+        _.range(1, firstPage.meta.pagination.pageCount + 1).map(it => fetchDeadlinePage(it))
     );
     return [...firstPage.data, ...otherPages.flatMap(it => it.data)]
 }
