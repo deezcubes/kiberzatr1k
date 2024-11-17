@@ -87,9 +87,9 @@ async function fetchDeadlinePage(page: number): Promise<DeadlineResponsePage> {
 }
 
 export async function fetchDeadlines(): Promise<DeadlineResponseDataObject[]> {
-    const firstPage = await fetchDeadlinePage(0);
+    const firstPage = await fetchDeadlinePage(1);
     const otherPages = await Promise.all(
-        _.range(1, firstPage.meta.pagination.pageCount + 1).map(it => fetchDeadlinePage(it))
+        _.range(2, firstPage.meta.pagination.pageCount + 1).map(it => fetchDeadlinePage(it))
     );
     return [...firstPage.data, ...otherPages.flatMap(it => it.data)]
 }
