@@ -4,12 +4,12 @@ RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev g
 WORKDIR /opt/
 COPY package.json yarn.lock ./
 RUN yarn global add node-gyp
-RUN yarn config set network-timeout 600000 -g && yarn install
+RUN yarn config set network-timeout 600000 -g && yarn install && yarn cache clean
 ENV PATH /opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
 COPY . .
 RUN yarn openapi:generate
-RUN yarn build
+RUN yarn build && yarn cache clean
 
 FROM node:18-alpine as deps
 RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev git > /dev/null 2>&1
@@ -18,7 +18,7 @@ ENV NODE_ENV=production
 WORKDIR /opt/
 COPY package.json yarn.lock ./
 RUN yarn global add node-gyp
-RUN yarn config set network-timeout 600000 -g && yarn install
+RUN yarn config set network-timeout 600000 -g && yarn install && yarn cache clean
 
 FROM node:18-alpine
 
