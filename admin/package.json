@@ -11,17 +11,17 @@
     "deploy": "strapi deploy"
   },
   "dependencies": {
-    "@cloudamqp/amqp-client": "^3.1.1",
-    "@strapi/plugin-cloud": "4.25.18",
-    "@strapi/plugin-documentation": "^4.25.18",
-    "@strapi/plugin-i18n": "4.25.18",
-    "@strapi/plugin-users-permissions": "4.25.18",
-    "@strapi/strapi": "4.25.18",
+    "@strapi/plugin-cloud": "4.25.11",
+    "@strapi/plugin-documentation": "^4.25.11",
+    "@strapi/plugin-i18n": "4.25.11",
+    "@strapi/plugin-users-permissions": "4.25.11",
+    "@strapi/strapi": "4.25.11",
     "pg": "8.8.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "5.3.4",
-    "styled-components": "6.1.13"
+    "styled-components": "5.3.3",
+    "@cloudamqp/amqp-client": "^3.1.1"
   },
   "author": {
     "name": "A Strapi developer"
@@ -36,8 +36,5 @@
     "node": ">=18.0.0 <=20.x.x",
     "npm": ">=6.0.0"
   },
-  "license": "MIT",
-  "devDependencies": {
-    "modclean": "^3.0.0-beta.1"
-  }
+  "license": "MIT"
 }
