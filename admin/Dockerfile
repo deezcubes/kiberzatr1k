@@ -4,14 +4,16 @@ ENV NODE_ENV=production
 
 WORKDIR /opt/
 COPY package.json yarn.lock ./
-RUN yarn global add node-gyp
-RUN yarn config set network-timeout 600000 -g && yarn install --production
+RUN yarn global add node-gyp && yarn cache clean --all
+RUN yarn config set network-timeout 600000 -g && yarn install --production && yarn cache clean --all
 ENV PATH /opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
 COPY . .
-RUN yarn build
+RUN yarn build && yarn cache clean --all
 WORKDIR /opt/app/src/plugins/mq
-RUN yarn build
+RUN yarn build && yarn cache clean --all
+WORKDIR /opt
+RUN yarn global add clean-modules && clean-modules -y
 
 FROM node:18.18-alpine3.17
 RUN apk add --no-cache vips-dev
