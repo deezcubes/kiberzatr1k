@@ -1,8 +1,16 @@
-import {Telegraf} from "telegraf";
-import {DeadlineDto, formatDeadline, formatDeadlines, getActiveDeadlines, mapMqDeadeline} from "./model";
-import {config} from "./config";
+import {Telegraf, Markup} from "telegraf";
+import {
+    DeadlineDto,
+    formatDeadline,
+    formatDeadlines,
+    getActiveDeadlines,
+    mapMqDeadeline
+} from "./model";
+import {config, phrases} from "./config";
 import {handleMqEvents} from './mq'
 import dayjs from "dayjs";
+import {callbackQuery} from "telegraf/filters";
+import _ from "lodash";
 
 const bot = new Telegraf(config.BOT_TOKEN)
 
@@ -55,11 +63,23 @@ function wrapErrors<T>(title: string, fn: (ctx: T) => Promise<void>): (ctx: T) =
     }
 }
 
+
 bot.command("remind", wrapErrors('/remind', async (ctx) => {
-    await listWithTitle(
+    if (ctx.chat.type !== 'private') {
+        if (ctx.from.id === 1039469528) {
+            await ctx.sendMessage("иди нахуй");
+            return;
+        }
+        await ctx.sendMessage(remindMessage());
+        return;
+    }
+    console.log("Remind command")
+    const deadlines = await getActiveDeadlines();
+
+    await listPageWithTitle(
         ctx.chat.id,
         'Список дедлайнов',
-        await getActiveDeadlines()
+        deadlines.slice(0, config.COUNT_PER_PAGE), 0, config.COUNT_PER_PAGE, deadlines.length
     )
 }))
 
@@ -70,7 +90,7 @@ bot.hears(/^д+а+$/i, wrapErrors('да', async (ctx) => {
 bot.command("nextweek", wrapErrors('/nextweek', async (ctx) => {
     await listWithTitle(
         ctx.chat.id,
-        'Совсем скоро',
+        'Дедлайны на следующую неделю',
         (await getActiveDeadlines()).filter((d) => d.datetime.isBefore(dayjs().add(7, 'day')))
     );
 }))
@@ -88,9 +108,82 @@ bot.command("an",
     })
 )
 
+bot.action(/^page_.*/, wrapErrors('кнопка', async (ctx) => {
+    if (!ctx.has(callbackQuery("data"))) {
+        return
+    }
+
+    const args = ctx.callbackQuery.data.split('_');
+
+    if (args[1] === undefined || args[2] === undefined || args[3] === undefined)
+        return;
+
+    const buttonTs = Number.parseInt(args[3])
+    let offset = Number.parseInt(args[1])
+    const count = Number.parseInt(args[2])
+
+    if (dayjs().diff(dayjs(buttonTs), 'minute') > 10) {
+        offset = 0;
+    }
+
+    console.log(`Offset ${offset} count ${count}`)
+
+    const deadlines = await getActiveDeadlines();
+
+    if (offset > deadlines.length) {
+        offset = Math.floor(deadlines.length / count) * count;
+    }
+
+    const page = Math.floor(offset / count) + 1
+    const maxPage = Math.ceil(deadlines.length / count)
+
+    const deadlinePage = deadlines.slice(offset, offset+count);
+
+    const timestamp = dayjs().valueOf();
+
+    await ctx.editMessageText(`<b>Список дедлайнов</b>` + '\n\n' + formatDeadlines(deadlinePage, offset),
+        {
+            parse_mode: 'HTML', link_preview_options: {is_disabled: true},
+            reply_markup: Markup.inlineKeyboard(
+                [[
+                    Markup.button.callback("← пред.", `page_${Math.max(offset - count, 0)}_${count}_${timestamp}`),
+                    Markup.button.callback(`${page}/${maxPage}`, "counter"),
+                    Markup.button.callback("след. →", `page_${offset + count}_${count}_${timestamp}`),
+                ]]
+            ).reply_markup
+        }
+    )
+
+    await ctx.answerCbQuery();
+
+}))
+
+bot.action("counter", wrapErrors('counter', async (ctx) => {
+    await ctx.answerCbQuery("Ну вот такая страница ща")
+}))
+
 export async function listWithTitle(chatId: number, title: string, deadlines: DeadlineDto[]) {
     await bot.telegram.sendMessage(chatId, `<b>${title}</b>` + '\n\n' + formatDeadlines(deadlines),
         {parse_mode: 'HTML', link_preview_options: {is_disabled: true}})
+}
+
+export async function listPageWithTitle(chatId: number, title: string, deadlines: DeadlineDto[],
+                                        offset: number, count: number, length: number) {
+    const timestamp = dayjs().valueOf();
+    const page = Math.floor(offset / count) + 1
+    const maxPage = Math.ceil(length / count)
+
+    await bot.telegram.sendMessage(chatId, `<b>${title}</b>` + '\n\n' + formatDeadlines(deadlines, offset),
+        {
+            parse_mode: 'HTML', link_preview_options: {is_disabled: true},
+            reply_markup: Markup.inlineKeyboard(
+                [[
+                    Markup.button.callback("← пред.", `page_${Math.max(offset - count, 0)}_${count}_${timestamp}`),
+                    Markup.button.callback(`${page}/${maxPage}`, "counter"),
+                    Markup.button.callback("след. →", `page_${offset + count}_${count}_${timestamp}`),
+                ]]
+            ).reply_markup
+        })
 }
 
 export async function listSchedule(chatId: number, schedule: string) {
@@ -102,6 +195,10 @@ export async function listSchedule(chatId: number, schedule: string) {
     await bot.telegram.pinChatMessage(chatId, message.message_id, {
         disable_notification: true
     })
+}
+
+function remindMessage(): string {
+    return `${_.sample(phrases.remindBegin)}, ${_.sample(phrases.remindEnd)}`
 }
 
 export async function launch() {
