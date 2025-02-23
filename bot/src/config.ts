@@ -19,6 +19,6 @@ export const config: Config = <Config>{
 }
 
 export const phrases = {
-    remindBegin: ["давай в лс", "залетай в лс", "жду в личке"],
-    remindEnd: ["дорогуша", "зайка", "солнышко"]
+    remindBegin: ["давай в лс", "залетай в лс", "жду в личке", "го в личку"],
+    remindEnd: ["дорогуша", "зайка", "солнышко", "котик"]
 }
