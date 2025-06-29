@@ -362,6 +362,38 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
+export interface ApiCampaignCampaign extends Schema.CollectionType {
+  collectionName: 'campaigns';
+  info: {
+    singularName: 'campaign';
+    pluralName: 'campaigns';
+    displayName: 'Campaign';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    system: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::campaign.campaign',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::campaign.campaign',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiDeadlineDeadline extends Schema.CollectionType {
   collectionName: 'deadlines';
   info: {
@@ -374,15 +406,20 @@ export interface ApiDeadlineDeadline extends Schema.CollectionType {
     draftAndPublish: false;
   };
   attributes: {
-    subject: Attribute.Relation<
-      'api::deadline.deadline',
-      'oneToOne',
-      'api::subject.subject'
-    >;
     name: Attribute.String & Attribute.Required;
     datetime: Attribute.DateTime & Attribute.Required;
     comment: Attribute.RichText;
     link: Attribute.String;
+    campaign: Attribute.Relation<
+      'api::deadline.deadline',
+      'oneToOne',
+      'api::campaign.campaign'
+    >;
+    players: Attribute.Relation<
+      'api::deadline.deadline',
+      'oneToMany',
+      'api::player.player'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -400,29 +437,30 @@ export interface ApiDeadlineDeadline extends Schema.CollectionType {
   };
 }
 
-export interface ApiSubjectSubject extends Schema.CollectionType {
-  collectionName: 'subjects';
+export interface ApiPlayerPlayer extends Schema.CollectionType {
+  collectionName: 'players';
   info: {
-    singularName: 'subject';
-    pluralName: 'subjects';
-    displayName: 'Subject';
-    description: '';
+    singularName: 'player';
+    pluralName: 'players';
+    displayName: 'Player';
   };
   options: {
-    draftAndPublish: false;
+    draftAndPublish: true;
   };
   attributes: {
-    name: Attribute.String & Attribute.Required & Attribute.Unique;
+    name: Attribute.String;
+    tgid: Attribute.BigInteger;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
-      'api::subject.subject',
+      'api::player.player',
       'oneToOne',
       'admin::user'
     > &
       Attribute.Private;
     updatedBy: Attribute.Relation<
-      'api::subject.subject',
+      'api::player.player',
       'oneToOne',
       'admin::user'
     > &
@@ -866,8 +904,9 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
+      'api::campaign.campaign': ApiCampaignCampaign;
       'api::deadline.deadline': ApiDeadlineDeadline;
-      'api::subject.subject': ApiSubjectSubject;
+      'api::player.player': ApiPlayerPlayer;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::content-releases.release': PluginContentReleasesRelease;

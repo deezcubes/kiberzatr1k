@@ -3,13 +3,20 @@ import {config} from "./config";
 
 export type EventType = 'CREATED' | 'UPDATED'
 
+interface PlayerMqDto {
+    id: number,
+    name: string,
+    tgid: number
+}
+
 export interface DeadlineMqDto {
     id: number,
     name: string,
-    subject: string | null,
     datetime: string,
     comment: string | null,
-    link: string | null
+    link: string | null,
+    players: PlayerMqDto[],
+    campaign: string | null
 }
 
 export interface MqMessage {

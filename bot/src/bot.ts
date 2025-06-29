@@ -78,7 +78,7 @@ bot.command("remind", wrapErrors('/remind', async (ctx) => {
 
     await listPageWithTitle(
         ctx.chat.id,
-        'Список дедлайнов',
+        'Список будущих встреч',
         deadlines.slice(0, config.COUNT_PER_PAGE), 0, config.COUNT_PER_PAGE, deadlines.length
     )
 }))
@@ -162,6 +162,7 @@ bot.action("counter", wrapErrors('counter', async (ctx) => {
     await ctx.answerCbQuery("Ну вот такая страница ща")
 }))
 
+
 export async function listWithTitle(chatId: number, title: string, deadlines: DeadlineDto[]) {
     await bot.telegram.sendMessage(chatId, `<b>${title}</b>` + '\n\n' + formatDeadlines(deadlines),
         {parse_mode: 'HTML', link_preview_options: {is_disabled: true}})
@@ -217,7 +218,7 @@ export async function launch() {
 
             await bot.telegram.sendMessage(
                 config.CHAT_ID,
-                'Дедлайн ' + (mqMessage.type === 'CREATED' ? 'добавлен' : 'изменён') + ': \n' + formatDeadline(deadlineDto),
+                'Встреча ' + (mqMessage.type === 'CREATED' ? 'добавлена' : 'изменена') + ': \n' + formatDeadline(deadlineDto),
                 {parse_mode: 'HTML', link_preview_options: {is_disabled: true}}
             )
         } catch (e: unknown) {

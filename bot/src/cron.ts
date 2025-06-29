@@ -1,10 +1,9 @@
 import {CronJob} from "cron";
-import {listSchedule, listWithTitle, reportError} from "./bot";
+import {listWithTitle, reportError} from "./bot";
 import {config} from "./config";
 import dayjs, {ManipulateType} from "dayjs";
 import {getActiveDeadlines, getAllDeadlines} from "./model";
 import fs from "node:fs";
-import {getCurrentScheduleFormatted} from "./schedule";
 
 interface Reminder {
     value: number,
@@ -17,8 +16,8 @@ function getReminderId(reminder: Reminder): string {
 }
 
 const remindersConfig: Reminder[] = [
-    {value: 0, unit: 'minute', name: '‼️ Прямо сейчас наступают дедлайн(ы):'},
-    {value: 1, unit: 'hour', name: '‼️ Через час наступят дедлайн(ы):'},
+    {value: 0, unit: 'minute', name: '‼️ Прямо сейчас начинаются встречи:'},
+    {value: 1, unit: 'hour', name: '‼️ Через час начнутся встречи:'},
 ]
 
 interface FileData {
@@ -41,20 +40,6 @@ function writeFileData(data: FileData) {
 }
 
 const cronJobs = [
-    new CronJob(
-        '0 6 * * *',
-        async () => {
-            try {
-                const schedule = await getCurrentScheduleFormatted()
-                if (schedule === null) {
-                    return
-                }
-                await listSchedule(config.CHAT_ID, schedule)
-            } catch (e: unknown) {
-                await reportError(e, config.CHAT_ID, 'Обновление расписания')
-            }
-        }
-    ),
     new CronJob(
         '0 6 * * *',
         async () => {

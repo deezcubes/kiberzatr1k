@@ -7,6 +7,7 @@ import _ from "lodash";
 
 export type DeadlineResponseDataObject = components['schemas']['DeadlineResponseDataObject']
 export type Deadline = components['schemas']['Deadline']
+export type Player = components['schemas']['Player']
 
 type StrapiMeta = { pagination: { pageCount: number } }
 type DeadlineResponsePage = {
@@ -56,7 +57,7 @@ async function fetchDeadlinePage(page: number): Promise<DeadlineResponsePage> {
     return pTimeout(client.GET('/deadlines', {
         params: {
             query: {
-                populate: 'subject',
+                populate: 'players,campaign',
                 pagination: {
                     page: page
                 }
