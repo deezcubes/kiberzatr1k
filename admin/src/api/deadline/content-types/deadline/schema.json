@@ -12,11 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "subject": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::subject.subject"
-    },
     "name": {
       "type": "string",
       "required": true
@@ -33,6 +28,16 @@
       "type": "string",
       "required": false,
       "regex": "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
+    },
+    "campaign": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::campaign.campaign"
+    },
+    "players": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::player.player"
     }
   }
 }

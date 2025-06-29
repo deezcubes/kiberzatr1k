@@ -1,5 +1,5 @@
 {
-  "/subjects": {
+  "/campaigns": {
     "get": {
       "responses": {
         "200": {
@@ -7,7 +7,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SubjectListResponse"
+                "$ref": "#/components/schemas/CampaignListResponse"
               }
             }
           }
@@ -64,7 +64,7 @@
         }
       },
       "tags": [
-        "Subject"
+        "Campaign"
       ],
       "parameters": [
         {
@@ -170,7 +170,7 @@
           }
         }
       ],
-      "operationId": "get/subjects"
+      "operationId": "get/campaigns"
     },
     "post": {
       "responses": {
@@ -179,7 +179,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SubjectResponse"
+                "$ref": "#/components/schemas/CampaignResponse"
               }
             }
           }
@@ -236,23 +236,23 @@
         }
       },
       "tags": [
-        "Subject"
+        "Campaign"
       ],
       "parameters": [],
-      "operationId": "post/subjects",
+      "operationId": "post/campaigns",
       "requestBody": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/SubjectRequest"
+              "$ref": "#/components/schemas/CampaignRequest"
             }
           }
         }
       }
     }
   },
-  "/subjects/{id}": {
+  "/campaigns/{id}": {
     "get": {
       "responses": {
         "200": {
@@ -260,7 +260,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SubjectResponse"
+                "$ref": "#/components/schemas/CampaignResponse"
               }
             }
           }
@@ -317,7 +317,7 @@
         }
       },
       "tags": [
-        "Subject"
+        "Campaign"
       ],
       "parameters": [
         {
@@ -331,7 +331,7 @@
           }
         }
       ],
-      "operationId": "get/subjects/{id}"
+      "operationId": "get/campaigns/{id}"
     },
     "put": {
       "responses": {
@@ -340,7 +340,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SubjectResponse"
+                "$ref": "#/components/schemas/CampaignResponse"
               }
             }
           }
@@ -397,7 +397,7 @@
         }
       },
       "tags": [
-        "Subject"
+        "Campaign"
       ],
       "parameters": [
         {
@@ -411,13 +411,13 @@
           }
         }
       ],
-      "operationId": "put/subjects/{id}",
+      "operationId": "put/campaigns/{id}",
       "requestBody": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/SubjectRequest"
+              "$ref": "#/components/schemas/CampaignRequest"
             }
           }
         }
@@ -488,7 +488,7 @@
         }
       },
       "tags": [
-        "Subject"
+        "Campaign"
       ],
       "parameters": [
         {
@@ -502,7 +502,7 @@
           }
         }
       ],
-      "operationId": "delete/subjects/{id}"
+      "operationId": "delete/campaigns/{id}"
     }
   }
 }

@@ -3,24 +3,26 @@ type EventType = 'CREATED' | 'UPDATED'
 interface DeadlineMqDto {
   id: number,
   name: string,
-  subject: string | null,
   datetime: string,
   comment: string | null,
-  link: string | null
+  link: string | null,
+  players: any,
+  campaign: string | null
 }
 
 async function sendEvent(type: EventType, id: number) {
   const rawEntry = await strapi.entityService.findOne('api::deadline.deadline', id, {
-    populate: {subject: true},
+    populate: {players: true, campaign: true},
   });
-
+  console.log(rawEntry.players)
   const entry = <DeadlineMqDto>{
     id,
     name: rawEntry.name,
-    subject: rawEntry.subject?.name ?? null,
     datetime: rawEntry.datetime,
     comment: rawEntry.comment ?? null,
-    link: rawEntry.link ?? null
+    link: rawEntry.link ?? null,
+    players: rawEntry.players,
+    campaign: rawEntry.campaign?.title ?? null
   }
 
   try {
