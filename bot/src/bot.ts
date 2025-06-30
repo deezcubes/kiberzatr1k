@@ -66,10 +66,6 @@ function wrapErrors<T>(title: string, fn: (ctx: T) => Promise<void>): (ctx: T) =
 
 bot.command("remind", wrapErrors('/remind', async (ctx) => {
     if (ctx.chat.type !== 'private') {
-        if (ctx.from.id === 1039469528) {
-            await ctx.sendMessage("иди нахуй");
-            return;
-        }
         await ctx.sendMessage(remindMessage());
         return;
     }
@@ -199,7 +195,8 @@ export async function listSchedule(chatId: number, schedule: string) {
 }
 
 function remindMessage(): string {
-    return `${_.sample(phrases.remindBegin)}, ${_.sample(phrases.remindEnd)}`
+    const begin = _.sample(phrases.remindBegin)!
+    return `${begin.sentence}, ${_.sample(phrases.remindMiddle)}${begin.punct} ${_.sample(phrases.remindEnd)}`
 }
 
 export async function launch() {
