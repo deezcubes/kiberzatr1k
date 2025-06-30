@@ -45,7 +45,7 @@ const cronJobs = [
         async () => {
             try {
                 await listWithTitle(config.CHAT_ID,
-                    "‼️ Дедлайны на сегодня:",
+                    "‼️ Сегодняшние встречи:",
                     (await getActiveDeadlines()).filter(it => it.datetime.isSame(dayjs(), 'date'))
                 )
             } catch (e: unknown) {
@@ -58,7 +58,7 @@ const cronJobs = [
         async () => {
             try {
                 await listWithTitle(config.CHAT_ID,
-                    "‼️ Дедлайны на сегодня и завтра:",
+                    "‼️ Сегодняшние и завтрашние встречи:",
                     (await getActiveDeadlines()).filter(it => it.datetime.isSame(dayjs(), 'date') ||
                         it.datetime.isSame(dayjs().add(1, 'day'), 'date'))
                 )
@@ -72,7 +72,7 @@ const cronJobs = [
         async () => {
             try {
                 await listWithTitle(config.CHAT_ID,
-                    "‼️ Дедлайны на следующую неделю:",
+                    "‼️ Встречи на следующей неделе:",
                     (await getActiveDeadlines()).filter(it => it.datetime.isBefore(
                         dayjs().add(8, 'day')
                             .add(4, 'hour'))
