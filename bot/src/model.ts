@@ -81,7 +81,7 @@ export function formatDeadline(deadline: DeadlineDto): string {
     return `` + `<b>${deadline.campaign ?? 'неизвестная хуйня'}</b> - ${deadline.name}
 ⏰ ${deadline.datetime.format('DD.MM.YY HH:mm')} <i>(${deadline.datetime.fromNow()})</i>
 ` + (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>` + '\n' : ``) +
-        (deadline.players.length !== 0 ? "👤 <b>Игроки</b>:\n" + deadline.players.map(pl => `- <a href="tg://user?id=${pl.tgid}">${pl.name}</a>`).join('\n') : "") + '\n' +
+        (deadline.players.length !== 0 ? "👤 " + deadline.players.map(pl => `<a href="tg://user?id=${pl.tgid}">${pl.name}</a>`).join(', ') : "") + '\n' +
         (deadline.comment ?? ``)
 }
 
