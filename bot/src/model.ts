@@ -39,7 +39,7 @@ function mapDeadline(id: number, deadline: Deadline): DeadlineDto {
         id,
         name: deadline.name,
         campaign: deadline.campaign?.data?.attributes?.title ?? null,
-        players: deadline.players?.data?.map((val) => mapPlayer(val.attributes!)) ?? [],
+        players: deadline.players?.data?.map((val) => mapPlayer(val.attributes ?? { name: 'ошибка', tgid: "0"})) ?? [],
         datetime: dayjs(deadline.datetime),
         comment: formatComment(deadline.comment ?? null),
         link: deadline.link ?? null

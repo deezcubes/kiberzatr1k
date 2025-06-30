@@ -195,7 +195,7 @@ export async function listSchedule(chatId: number, schedule: string) {
 }
 
 function remindMessage(): string {
-    const begin = _.sample(phrases.remindBegin)!
+    const begin = _.sample(phrases.remindBegin) ?? { sentence: 'Говна поел я', punct: 'Путник' }
     return `${begin.sentence}, ${_.sample(phrases.remindMiddle)}${begin.punct} ${_.sample(phrases.remindEnd)}`
 }
 
