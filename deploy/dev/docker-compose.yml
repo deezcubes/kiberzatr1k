@@ -4,7 +4,7 @@ volumes:
 
 services:
   postgres:
-    image: postgres
+    image: postgres:16.4
     restart: always
     shm_size: 128mb
     environment:
@@ -17,7 +17,7 @@ services:
     ports:
       - 5432:5432
   lavinmq:
-    image: cloudamqp/lavinmq
+    image: cloudamqp/lavinmq:2.4
     restart: always
     shm_size: 128mb
     volumes:

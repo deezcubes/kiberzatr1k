@@ -38,6 +38,11 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::player.player"
+    },
+    "location": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::location.location"
     }
   }
 }

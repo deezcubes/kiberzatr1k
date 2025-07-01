@@ -8,6 +8,7 @@ import _ from "lodash";
 export type DeadlineResponseDataObject = components['schemas']['DeadlineResponseDataObject']
 export type Deadline = components['schemas']['Deadline']
 export type Player = components['schemas']['Player']
+export type Loc = components['schemas']['Location']
 
 type StrapiMeta = { pagination: { pageCount: number } }
 type DeadlineResponsePage = {

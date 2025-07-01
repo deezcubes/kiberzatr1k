@@ -9,6 +9,12 @@ interface PlayerMqDto {
     tgid: number
 }
 
+interface LocationMqDto {
+    id: number,
+    name: string,
+    link: string
+}
+
 export interface DeadlineMqDto {
     id: number,
     name: string,
@@ -16,7 +22,8 @@ export interface DeadlineMqDto {
     comment: string | null,
     link: string | null,
     players: PlayerMqDto[],
-    campaign: string | null
+    campaign: string | null,
+    location: LocationMqDto | null
 }
 
 export interface MqMessage {

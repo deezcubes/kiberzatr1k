@@ -1,21 +1,20 @@
 {
   "kind": "collectionType",
-  "collectionName": "campaigns",
+  "collectionName": "locations",
   "info": {
-    "singularName": "campaign",
-    "pluralName": "campaigns",
-    "displayName": "Campaign",
-    "description": ""
+    "singularName": "location",
+    "pluralName": "locations",
+    "displayName": "Location"
   },
   "options": {
     "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
-    "title": {
+    "name": {
       "type": "string"
     },
-    "system": {
+    "link": {
       "type": "string"
     }
   }

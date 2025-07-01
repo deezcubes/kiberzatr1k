@@ -1,6 +1,6 @@
 import {marked, Tokens} from "marked";
 import dayjs from "dayjs";
-import {Deadline, fetchDeadlines, Player} from "./api";
+import {Deadline, fetchDeadlines, Loc, Player} from "./api";
 import sanitizeHtml from "sanitize-html";
 import {DeadlineMqDto} from "./mq";
 import _ from 'lodash'
@@ -17,6 +17,12 @@ export interface PlayerDto {
     name: string,
     tgid: number
 }
+
+export interface LocationDto {
+    name: string | null,
+    link: string | null
+}
+
 export interface DeadlineDto {
     id: number,
     name: string,
@@ -24,7 +30,8 @@ export interface DeadlineDto {
     players: PlayerDto[],
     datetime: dayjs.Dayjs,
     comment: string | null,
-    link: string | null
+    link: string | null,
+    location: LocationDto | null
 }
 
 function formatComment(comment: (string | null)): string | null {
@@ -42,7 +49,8 @@ function mapDeadline(id: number, deadline: Deadline): DeadlineDto {
         players: deadline.players?.data?.map((val) => mapPlayer(val.attributes ?? { name: 'ошибка', tgid: "0"})) ?? [],
         datetime: dayjs(deadline.datetime),
         comment: formatComment(deadline.comment ?? null),
-        link: deadline.link ?? null
+        link: deadline.link ?? null,
+        location: mapLocation(deadline.location?.data?.attributes)
     };
 }
 
@@ -50,6 +58,16 @@ function mapPlayer(player: Player): PlayerDto {
     return {
         name: player.name ?? "",
         tgid: Number.parseInt(player.tgid ?? "0")
+    }
+}
+
+function mapLocation(location: Loc | undefined): LocationDto | null {
+    if (location === undefined)
+        return null
+
+    return {
+        name: location.name ?? null,
+        link: location.link ?? null
     }
 }
 
@@ -61,7 +79,8 @@ export function mapMqDeadeline(deadline: DeadlineMqDto): DeadlineDto {
         players: deadline.players,
         datetime: dayjs(deadline.datetime),
         comment: formatComment(deadline.comment),
-        link: deadline.link
+        link: deadline.link,
+        location: deadline.location
     }
 }
 
@@ -80,7 +99,8 @@ export async function getActiveDeadlines() {
 export function formatDeadline(deadline: DeadlineDto): string {
     return `` + `<b>${deadline.campaign ?? 'неизвестная хуйня'}</b> - ${deadline.name}
 ⏰ ${deadline.datetime.format('DD.MM.YY HH:mm')} <i>(${deadline.datetime.fromNow()})</i>
-` + (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>` + '\n' : ``) +
+` + (deadline.location ? `📍 <a href="${deadline.location.link}">${deadline.location.name}</a>\n`: '') +
+        (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>\n` : ``) +
         (deadline.players.length !== 0 ? "👤 " + deadline.players.map(pl => `<a href="tg://user?id=${pl.tgid}">${pl.name}</a>`).join(', ') : "") + '\n' +
         (deadline.comment ?? ``)
 }
