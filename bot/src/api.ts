@@ -58,7 +58,7 @@ async function fetchDeadlinePage(page: number): Promise<DeadlineResponsePage> {
     return pTimeout(client.GET('/deadlines', {
         params: {
             query: {
-                populate: 'players,campaign',
+                populate: 'players,campaign,location',
                 pagination: {
                     page: page
                 }
