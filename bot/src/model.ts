@@ -101,7 +101,7 @@ function playerMapperProvider(mention: boolean): (p: PlayerDto) => string {
         if (mention) {
             return `<a href="tg://user?id=${pl.tgid}">${pl.name}</a>`
         } else {
-            return '{pl.name}'
+            return `${pl.name}`
         }
     }
 }
