@@ -83,14 +83,6 @@ bot.hears(/^д+а+$/i, wrapErrors('да', async (ctx) => {
     await ctx.sendVoice({source: './assets/pizda.ogg'})
 }))
 
-bot.command("nextweek", wrapErrors('/nextweek', async (ctx) => {
-    await listWithTitle(
-        ctx.chat.id,
-        'Дедлайны на следующую неделю',
-        (await getActiveDeadlines()).filter((d) => d.datetime.isBefore(dayjs().add(7, 'day')))
-    );
-}))
-
 bot.command("an",
     wrapErrors('/an', async (ctx) => {
         if (ctx.message.reply_to_message === undefined) {
