@@ -41,42 +41,34 @@ function writeFileData(data: FileData) {
 
 const cronJobs = [
     new CronJob(
-        '0 6 * * *',
+        '0 10 * * *',
         async () => {
             try {
+                const deadlines = (await getActiveDeadlines()).filter(it => it.datetime.isSame(dayjs(), 'date'));
+                if (deadlines.length === 0) {
+                    return;
+                }
                 await listWithTitle(config.CHAT_ID,
                     "‼️ Сегодняшние встречи:",
-                    (await getActiveDeadlines()).filter(it => it.datetime.isSame(dayjs(), 'date'))
+                    deadlines
                 )
             } catch (e: unknown) {
-                await reportError(e, config.CHAT_ID, 'cron: 0 6 * * *')
+                await reportError(e, config.CHAT_ID, 'cron: 0 10 * * *')
             }
         }
     ),
     new CronJob(
-        '0 16 * * *',
+        '0 20 * * 7',
         async () => {
             try {
-                await listWithTitle(config.CHAT_ID,
-                    "‼️ Сегодняшние и завтрашние встречи:",
-                    (await getActiveDeadlines()).filter(it => it.datetime.isSame(dayjs(), 'date') ||
-                        it.datetime.isSame(dayjs().add(1, 'day'), 'date'))
-                )
-            } catch (e: unknown) {
-                await reportError(e, config.CHAT_ID, 'cron: 0 16 * * *')
-            }
-        }
-    ),
-    new CronJob(
-        '0 20 * * 6',
-        async () => {
-            try {
+                const deadlines = (await getActiveDeadlines()).filter(it => it.datetime.isBefore(
+                        dayjs().add(7, 'day').add(4, 'hour')));
+                if (deadlines.length === 0) {
+                    return;
+                }
                 await listWithTitle(config.CHAT_ID,
                     "‼️ Встречи на следующей неделе:",
-                    (await getActiveDeadlines()).filter(it => it.datetime.isBefore(
-                        dayjs().add(8, 'day')
-                            .add(4, 'hour'))
-                    )
+                    deadlines
                 )
             } catch (e: unknown) {
                 await reportError(e, config.CHAT_ID, 'cron: 0 20 * * 6')

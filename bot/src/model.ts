@@ -96,12 +96,23 @@ export async function getActiveDeadlines() {
 }
 
 
-export function formatDeadline(deadline: DeadlineDto): string {
+function playerMapperProvider(mention: boolean): (p: PlayerDto) => string {
+    return (pl: PlayerDto) => {
+        if (mention) {
+            return `<a href="tg://user?id=${pl.tgid}">${pl.name}</a>`
+        } else {
+            return '{pl.name}'
+        }
+    }
+}
+
+export function formatDeadline(deadline: DeadlineDto, mention: boolean = true): string {
+    const playerMapper = playerMapperProvider(mention);
     return `` + `<b>${deadline.campaign ?? 'неизвестная хуйня'}</b> - ${deadline.name}
 ⏰ ${deadline.datetime.format('DD.MM.YY HH:mm')} <i>(${deadline.datetime.fromNow()})</i>
 ` + (deadline.location ? `📍 <a href="${deadline.location.link}">${deadline.location.name}</a>\n`: '') +
         (deadline.link ? `🔗 <a href="${deadline.link}">Ссылка</a>\n` : ``) +
-        (deadline.players.length !== 0 ? "👤 " + deadline.players.map(pl => `<a href="tg://user?id=${pl.tgid}">${pl.name}</a>`).join(', ') : "") + '\n' +
+        (deadline.players.length !== 0 ? "👤 " + deadline.players.map(playerMapper).join(', ') : "") + '\n' +
         (deadline.comment ?? ``)
 }
 

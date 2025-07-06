@@ -215,7 +215,7 @@ export async function launch() {
 
             await bot.telegram.sendMessage(
                 config.CHAT_ID,
-                'Встреча ' + (mqMessage.type === 'CREATED' ? 'добавлена' : 'изменена') + ': \n' + formatDeadline(deadlineDto),
+                'Встреча ' + (mqMessage.type === 'CREATED' ? 'добавлена' : 'изменена') + ': \n' + formatDeadline(deadlineDto, mqMessage.type === 'CREATED'),
                 {parse_mode: 'HTML', link_preview_options: {is_disabled: true}}
             )
         } catch (e: unknown) {
