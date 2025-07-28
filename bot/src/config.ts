@@ -17,18 +17,3 @@ export const config: Config = <Config>{
     CHAT_ID: Number(process.env["CHAT_ID"]),
     COUNT_PER_PAGE: Number(process.env["COUNT_PER_PAGE"] ?? 20)
 }
-
-export const phrases = {
-    remindBegin: [
-        {
-            sentence: 'Что тебя гложет',
-            punct: '?'
-        },
-        {
-            sentence: 'Будь как дома',
-            punct: '.'
-        }
-    ],
-    remindMiddle: ['странник', 'путник', 'друг мой'],
-    remindEnd: ['Загляни-ка в мою обитель.', 'Зайди ко мне на огонёк.', 'Может, обсудим твой вопрос наедине?']
-}
