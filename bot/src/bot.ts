@@ -65,10 +65,6 @@ function wrapErrors<T>(title: string, fn: (ctx: T) => Promise<void>): (ctx: T) =
 
 
 bot.command("remind", wrapErrors('/remind', async (ctx) => {
-    if (ctx.chat.type !== 'private') {
-        await ctx.sendMessage(remindMessage());
-        return;
-    }
     console.log("Remind command")
     const deadlines = await getActiveDeadlines();
 
@@ -184,11 +180,6 @@ export async function listSchedule(chatId: number, schedule: string) {
     await bot.telegram.pinChatMessage(chatId, message.message_id, {
         disable_notification: true
     })
-}
-
-function remindMessage(): string {
-    const begin = _.sample(phrases.remindBegin) ?? { sentence: 'Говна поел я', punct: 'Путник' }
-    return `${begin.sentence}, ${_.sample(phrases.remindMiddle)}${begin.punct} ${_.sample(phrases.remindEnd)}`
 }
 
 export async function launch() {
