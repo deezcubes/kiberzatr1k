@@ -1,4 +1,4 @@
-FROM node:18.18-alpine3.17 as build
+FROM node:20.19-alpine3.22 as build
 RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git > /dev/null 2>&1
 ENV NODE_ENV=production
 
@@ -15,7 +15,7 @@ RUN yarn build && yarn cache clean --all
 WORKDIR /opt
 RUN yarn global add clean-modules && clean-modules -y
 
-FROM node:18.18-alpine3.17
+FROM node:20.19-alpine3.22
 RUN apk add --no-cache vips-dev
 ENV NODE_ENV=production
 WORKDIR /opt/

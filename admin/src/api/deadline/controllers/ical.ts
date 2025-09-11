@@ -5,7 +5,7 @@ import Deadline from "./deadline";
 
 export default ({ strapi }: { strapi: Strapi }) => ({
     async getIcalFeed (ctx: Context) {
-        const calendar = ical({ name: 'calender' });
+        const calendar = ical({ name: 'iCal feed' });
         calendar.method(ICalCalendarMethod.REQUEST);
 
         // todo проверить что тут все дедлайны отдаются
