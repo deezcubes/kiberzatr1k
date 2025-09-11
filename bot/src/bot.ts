@@ -63,9 +63,6 @@ function wrapErrors<T>(title: string, fn: (ctx: T) => Promise<void>): (ctx: T) =
     }
 }
 
-bot.command("calendar", wrapErrors('/calendar', async (ctx) => {
-    await ctx.sendMessage(`Подписка на календарь: ${config.API_URL}/api/ical`)
-}))
 
 bot.command("remind", wrapErrors('/remind', async (ctx) => {
     if (ctx.chat.type !== 'private') {
