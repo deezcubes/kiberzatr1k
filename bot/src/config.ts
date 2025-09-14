@@ -6,7 +6,8 @@ export interface Config {
     AMQP_URL: string
     API_URL: string,
     CHAT_ID: number,
-    COUNT_PER_PAGE: number
+    COUNT_PER_PAGE: number,
+    PUBLIC_URL: string
 }
 
 export const config: Config = <Config>{
@@ -15,7 +16,8 @@ export const config: Config = <Config>{
     AMQP_URL: process.env["AMQP_URL"],
     API_URL: process.env["API_URL"],
     CHAT_ID: Number(process.env["CHAT_ID"]),
-    COUNT_PER_PAGE: Number(process.env["COUNT_PER_PAGE"] ?? 20)
+    COUNT_PER_PAGE: Number(process.env["COUNT_PER_PAGE"] ?? 20),
+    PUBLIC_URL: process.env["PUBLIC_URL"]
 }
 
 export const phrases = {

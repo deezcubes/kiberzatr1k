@@ -79,6 +79,7 @@ services:
       API_URL: http://strapi:1337/api
       AMQP_URL: amqp://guest:guest@lavinmq
       CHAT_ID: ${CHAT_ID}
+      PUBLIC_URL: ${PUBLIC_URL}
       TZ: Europe/Moscow
     volumes:
       - bot_data:/opt/app/data
