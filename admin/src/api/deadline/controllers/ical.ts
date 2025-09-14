@@ -9,7 +9,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
         }
 
         const calendar = ical({ name: 'iCal feed' });
-        calendar.method(ICalCalendarMethod.REQUEST);
+        calendar.method(ICalCalendarMethod.PUBLISH);
 
         // todo проверить что тут все дедлайны отдаются
         const deadlines = await strapi.entityService.findMany('api::deadline.deadline', {
@@ -22,7 +22,9 @@ export default ({ strapi }: { strapi: Strapi }) => ({
                 summary: (deadline.subject ? `[${deadline.subject.name}] ` : '') + deadline.name,
                 description: deadline.comment ?? null,
                 url: deadline.link ?? null,
-                start: deadline.datetime
+                start: deadline.datetime,
+                end: deadline.datetime,
+                stamp: deadline.updatedAt ?? null
             })
         }
 
