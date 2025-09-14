@@ -64,7 +64,7 @@ function wrapErrors<T>(title: string, fn: (ctx: T) => Promise<void>): (ctx: T) =
 }
 
 bot.command("calendar", wrapErrors('/calendar', async (ctx) => {
-    await ctx.sendMessage(`Подписка на календарь: ${config.PUBLIC_URL}/api/ical`)
+    await ctx.sendMessage(`Подписка на календарь: ${config.PUBLIC_URL}/api/ical?token=${config.ICAL_TOKEN}`)
 }))
 
 bot.command("remind", wrapErrors('/remind', async (ctx) => {

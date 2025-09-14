@@ -1,10 +1,13 @@
 import type {Context, Next} from 'koa';
 import {Strapi} from "@strapi/strapi";
 import ical, {ICalCalendarMethod, ICalEventData} from 'ical-generator'
-import Deadline from "./deadline";
 
 export default ({ strapi }: { strapi: Strapi }) => ({
     async getIcalFeed (ctx: Context) {
+        if (ctx.query.token !== strapi.config.get('custom.ical.token')) {
+            return ctx.unauthorized('Invalid or missing token')
+        }
+
         const calendar = ical({ name: 'iCal feed' });
         calendar.method(ICalCalendarMethod.REQUEST);
 

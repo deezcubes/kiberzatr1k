@@ -52,6 +52,7 @@ services:
       TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
       JWT_SECRET: ${STRAPI_JWT_SECRET}
       PUBLIC_URL: ${PUBLIC_URL}
+      ICAL_TOKEN: ${ICAL_TOKEN}
       # Database
       DATABASE_CLIENT: postgres
       DATABASE_HOST: postgres
@@ -80,6 +81,7 @@ services:
       AMQP_URL: amqp://guest:guest@lavinmq
       CHAT_ID: ${CHAT_ID}
       PUBLIC_URL: ${PUBLIC_URL}
+      ICAL_TOKEN: ${ICAL_TOKEN}
       TZ: Europe/Moscow
     volumes:
       - bot_data:/opt/app/data

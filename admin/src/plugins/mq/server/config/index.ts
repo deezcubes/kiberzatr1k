@@ -8,7 +8,7 @@ export default {
   }),
   validator: (config: MqPluginConfig) => {
     if (typeof config.CLOUDAMQP_URL !== 'string') {
-      throw new Error('KAFKA_CLIENT_ID has to be a string')
+      throw new Error('CLOUDAMQP_URL has to be a string')
     }
   }
 };
