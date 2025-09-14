@@ -52,6 +52,7 @@ services:
       TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
       JWT_SECRET: ${STRAPI_JWT_SECRET}
       PUBLIC_URL: ${PUBLIC_URL}
+      ICAL_TOKEN: ${ICAL_TOKEN}
       # Database
       DATABASE_CLIENT: postgres
       DATABASE_HOST: postgres
@@ -95,7 +96,6 @@ services:
       - "443:443/udp"
     environment:
       PUBLIC_URL: ${PUBLIC_URL}
-      ICAL_TOKEN: ${ICAL_TOKEN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
