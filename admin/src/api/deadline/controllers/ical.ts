@@ -18,7 +18,7 @@ export default ({ strapi }: { strapi: Strapi }) => ({
 
         for (const deadline of deadlines) {
             calendar.createEvent(<ICalEventData>{
-                id: deadline.id,
+                id: strapi.config.get('server.url') + ':' + String(deadline.id),
                 summary: (deadline.subject ? `[${deadline.subject.name}] ` : '') + deadline.name,
                 description: deadline.comment ?? null,
                 url: deadline.link ?? null,
