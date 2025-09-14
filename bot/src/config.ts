@@ -7,7 +7,8 @@ export interface Config {
     API_URL: string,
     CHAT_ID: number,
     COUNT_PER_PAGE: number,
-    PUBLIC_URL: string
+    PUBLIC_URL: string,
+    ICAL_TOKEN: string
 }
 
 export const config: Config = <Config>{
@@ -17,7 +18,8 @@ export const config: Config = <Config>{
     API_URL: process.env["API_URL"],
     CHAT_ID: Number(process.env["CHAT_ID"]),
     COUNT_PER_PAGE: Number(process.env["COUNT_PER_PAGE"] ?? 20),
-    PUBLIC_URL: process.env["PUBLIC_URL"]
+    PUBLIC_URL: process.env["PUBLIC_URL"],
+    ICAL_TOKEN: process.env["ICAL_TOKEN"]
 }
 
 export const phrases = {

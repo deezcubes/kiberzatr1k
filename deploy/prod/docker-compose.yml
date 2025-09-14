@@ -80,6 +80,7 @@ services:
       AMQP_URL: amqp://guest:guest@lavinmq
       CHAT_ID: ${CHAT_ID}
       PUBLIC_URL: ${PUBLIC_URL}
+      ICAL_TOKEN: ${ICAL_TOKEN}
       TZ: Europe/Moscow
     volumes:
       - bot_data:/opt/app/data
@@ -94,6 +95,7 @@ services:
       - "443:443/udp"
     environment:
       PUBLIC_URL: ${PUBLIC_URL}
+      ICAL_TOKEN: ${ICAL_TOKEN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
