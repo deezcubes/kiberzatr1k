@@ -70,7 +70,7 @@ bot.command("calendar", wrapErrors('/calendar', async (ctx) => {
 bot.command("remind", wrapErrors('/remind', async (ctx) => {
     if (ctx.chat.type !== 'private') {
         if (ctx.from.id === 1039469528) {
-            await ctx.sendMessage("иди нахуй");
+            await ctx.sendMessage(`иди нахуй, ${_.sample(phrases.remindEnd)}`);
             return;
         }
         await ctx.sendMessage(remindMessage());
