@@ -133,8 +133,8 @@ bot.action(/^page_.*/, wrapErrors('кнопка', async (ctx) => {
 
     const deadlines = await getActiveDeadlines();
 
-    if (offset > deadlines.length) {
-        offset = Math.floor(deadlines.length / count) * count;
+    if (offset >= deadlines.length) {
+        offset = Math.floor((deadlines.length + 1) / count) * count;
     }
 
     const page = Math.floor(offset / count) + 1
