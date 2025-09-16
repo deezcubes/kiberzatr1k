@@ -126,7 +126,7 @@ export async function fetchEtuSchedule() {
         ['subjectType', 'МЭк'],
         ['subjectType', 'Прак'],
         ['subjectType', 'Тест'],
-        ['groups', '5115'],
+        ['groups', '6103'],
         ['withSubjectCode', 'true'],
         ['withURL', 'true'],
     ]).toString())
