@@ -69,11 +69,13 @@ bot.command("calendar", wrapErrors('/calendar', async (ctx) => {
 
 bot.command("remind", wrapErrors('/remind', async (ctx) => {
     if (ctx.chat.type !== 'private') {
-        if (ctx.from.id === 1039469528) {
-            await ctx.sendMessage(`иди нахуй, ${_.sample(phrases.remindEnd)}`);
-            return;
-        }
-        await ctx.sendMessage(remindMessage());
+        await ctx.sendMessage(remindMessage(), {
+            reply_markup: Markup.inlineKeyboard(
+                [[
+                    Markup.button.url('в личку', 'https://t.me/zatr1kbot')
+                ]]
+            ).reply_markup
+        });
         return;
     }
     console.log("Remind command")
